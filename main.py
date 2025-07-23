@@ -191,10 +191,12 @@ def chat():
     </html>
     '''
 
+# ...existing code...
+
 if __name__ == '__main__':
-    # Modified for Replit - this is the key change!
+    # Get port from environment (Railway needs this)
     port = int(os.environ.get('PORT', 5000))
-    print("🚀 Cris.AI Simple Version Starting...")
+    print("🚀 Cris.AI Starting...")
     print(f"🌐 Running on port {port}")
-    # IMPORTANT: host='0.0.0.0' makes it accessible online
-    app.run(host='0.0.0.0', port=port, debug=True)
+    # IMPORTANT: host='0.0.0.0' for deployment
+    app.run(host='0.0.0.0', port=port, debug=False)
