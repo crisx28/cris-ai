@@ -11,11 +11,28 @@ so it runs anywhere out of the box.
 - ⏰ Built-in time / joke helpers
 - 🩺 `/health` endpoint for uptime checks
 
-## How to Run
-1. Install dependencies: `pip install -r requirements.txt`
-2. (Optional but recommended) Set your key: `export ANTHROPIC_API_KEY=sk-ant-...`
-3. Run: `python main.py`
-4. Open: http://localhost:5000
+## ⚡ Run it live in 60 seconds
+
+```bash
+git clone https://github.com/crisx28/cris-ai.git
+cd cris-ai
+pip install -r requirements.txt
+export ANTHROPIC_API_KEY=sk-ant-...   # your Claude API key — enables real AI responses
+python main.py
+```
+
+Then open **http://localhost:5000** and start chatting. The homepage shows
+🟢 when the Claude API is connected. No key handy? It still runs — Cris.AI
+drops to 🟡 offline mode with built-in replies, so you can see it working
+either way.
+
+Quick API test (no browser needed):
+
+```bash
+curl -X POST http://localhost:5000/api/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message": "Explain MCP in one line"}'
+```
 
 ## Configuration
 | Env var | Purpose | Default |
