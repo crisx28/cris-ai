@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: #f2f2f7;
+  color: #1c1c1e;
+  font-family: var(--tw-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", Roboto, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
+}
+
+/* iOS-style hidden-until-needed scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c7c7cc transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #c7c7cc;
+  border-radius: 999px;
+}
+
+@layer components {
+  /* Big rounded iOS card */
+  .card {
+    @apply rounded-4xl bg-white shadow-card;
+  }
+  .card-pressable {
+    @apply rounded-4xl bg-white shadow-card transition-all duration-200
+      active:scale-[0.98] hover:shadow-float;
+  }
+  .input {
+    @apply w-full rounded-2xl border-0 bg-grouped px-4 py-3 text-[15px]
+      text-ink outline-none ring-1 ring-transparent placeholder:text-subtle
+      focus:bg-white focus:ring-2 focus:ring-brand-400 transition;
+  }
+  .label {
+    @apply block text-[13px] font-medium text-subtle mb-1.5;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-500
+      px-5 py-3 text-[15px] font-semibold text-white shadow-sm transition-all
+      duration-200 hover:bg-brand-600 active:scale-[0.97] disabled:opacity-40;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-2xl px-3 py-2
+      text-[15px] font-medium text-ios-blue transition active:scale-[0.97];
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px]
+      font-medium;
+  }
+  /* Section title, iOS grouped-list style */
+  .section-title {
+    @apply px-1 text-[13px] font-semibold uppercase tracking-wide text-subtle;
+  }
+}
+
+@layer utilities {
+  .stagger > * {
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 0.02s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.06s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.10s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.14s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.18s; }
+  .stagger > *:nth-child(6) { animation-delay: 0.22s; }
+
+  /* Animated progress fill (grows on mount) */
+  .bar-fill {
+    transform-origin: left center;
+    animation: grow-x 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Confetti pieces */
+.confetti-piece {
+  position: fixed;
+  top: 0;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  will-change: transform, opacity;
+  animation: confetti-fall linear forwards;
+  z-index: 60;
+  pointer-events: none;
+}
