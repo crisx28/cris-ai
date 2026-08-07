@@ -1,0 +1,192 @@
+"use client";
+
+import { useState } from "react";
+import { Trash2, Plus, Plane } from "lucide-react";
+import { useStore } from "@/lib/store";
+import { peso, pct } from "@/lib/currency";
+import { travelProjection } from "@/lib/finance";
+import { PageHeader, StatCard, SectionCard, EmptyState, ProgressBar } from "@/components/ui";
+
+export default function TravelPage() {
+  const { data, ready, addTravel, updateTravel, deleteTravel } = useStore();
+  const [destination, setDestination] = useState("");
+  const [target, setTarget] = useState("");
+  const [current, setCurrent] = useState("");
+  const [travelDate, setTravelDate] = useState("");
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const t = parseFloat(target);
+    if (!t || t <= 0 || !destination.trim()) return;
+    addTravel({
+      destination: destination.trim(),
+      target: t,
+      current: parseFloat(current) || 0,
+      travelDate: travelDate || undefined,
+    });
+    setDestination("");
+    setTarget("");
+    setCurrent("");
+    setTravelDate("");
+  }
+
+  function contribute(id: string, currentAmt: number) {
+    const input = prompt("How much to add to this travel fund? (₱)");
+    if (!input) return;
+    const amt = parseFloat(input.replace(/,/g, ""));
+    if (!amt) return;
+    updateTravel(id, { current: currentAmt + amt });
+  }
+
+  const funds = ready ? data.travel : [];
+  const totalSaved = funds.reduce((t, f) => t + f.current, 0);
+  const totalTarget = funds.reduce((t, f) => t + f.target, 0);
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Travel Funds"
+        subtitle="Plan the trips your family deserves — one peso at a time."
+      />
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard label="Saved for travel" value={peso(totalSaved)} tone="brand" />
+        <StatCard label="Total target" value={peso(totalTarget)} />
+        <StatCard
+          label="Overall progress"
+          value={pct(totalTarget ? (totalSaved / totalTarget) * 100 : 0)}
+        />
+        <StatCard label="Trips planned" value={String(funds.length)} />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <SectionCard title="Plan a Trip">
+            <form onSubmit={submit} className="space-y-3">
+              <div>
+                <label className="label">Destination</label>
+                <input
+                  className="input"
+                  placeholder="e.g. Beijing, China 🇨🇳"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Target budget (₱)</label>
+                <input
+                  className="input"
+                  type="number"
+                  value={target}
+                  onChange={(e) => setTarget(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Already saved (₱)</label>
+                <input
+                  className="input"
+                  type="number"
+                  value={current}
+                  onChange={(e) => setCurrent(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Planned travel date</label>
+                <input
+                  className="input"
+                  type="date"
+                  value={travelDate}
+                  onChange={(e) => setTravelDate(e.target.value)}
+                />
+              </div>
+              <button className="btn-primary w-full" type="submit">
+                <Plus size={16} /> Add Trip
+              </button>
+            </form>
+          </SectionCard>
+        </div>
+
+        <div className="lg:col-span-2">
+          {funds.length === 0 ? (
+            <SectionCard title="Your Trips">
+              <EmptyState text="No trips planned yet. Dream big! ✈️" />
+            </SectionCard>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {funds.map((f) => {
+                const p = travelProjection(f);
+                return (
+                  <div key={f.id} className="card overflow-hidden">
+                    <div className="bg-gradient-to-r from-sky-500 to-cyan-500 px-5 py-4 text-white">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <Plane size={18} />
+                          <h3 className="font-semibold">{f.destination}</h3>
+                        </div>
+                        <button
+                          onClick={() => deleteTravel(f.id)}
+                          className="text-white/70 hover:text-white"
+                          aria-label="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      {f.travelDate && (
+                        <p className="mt-1 text-xs text-sky-100">
+                          {new Date(f.travelDate).toLocaleDateString("en-PH", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </p>
+                      )}
+                    </div>
+                    <div className="p-5">
+                      <div className="flex items-end justify-between">
+                        <div className="text-xl font-bold text-slate-900">
+                          {peso(f.current)}
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          of {peso(f.target)}
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <ProgressBar value={p.progress} color="#0ea5e9" />
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                        <div className="rounded-lg bg-slate-50 p-2">
+                          <div className="text-[11px] text-slate-400">
+                            Still needed
+                          </div>
+                          <div className="font-semibold text-slate-800">
+                            {peso(p.stillNeeded)}
+                          </div>
+                        </div>
+                        <div className="rounded-lg bg-slate-50 p-2">
+                          <div className="text-[11px] text-slate-400">
+                            Save / month
+                          </div>
+                          <div className="font-semibold text-slate-800">
+                            {p.recommendedMonthly
+                              ? peso(p.recommendedMonthly)
+                              : "—"}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => contribute(f.id, f.current)}
+                        className="btn-ghost mt-3 w-full justify-center bg-sky-50 text-sky-700"
+                      >
+                        <Plus size={15} /> Add to fund
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
