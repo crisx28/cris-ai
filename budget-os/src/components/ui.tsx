@@ -5,17 +5,22 @@ import React from "react";
 export function PageHeader({
   title,
   subtitle,
+  emoji,
   action,
 }: {
   title: string;
   subtitle?: string;
+  emoji?: string;
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div className="mb-5 flex items-start justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+        <h1 className="text-[28px] font-bold tracking-tight text-ink">
+          {emoji && <span className="mr-1.5">{emoji}</span>}
+          {title}
+        </h1>
+        {subtitle && <p className="mt-1 text-[15px] text-subtle">{subtitle}</p>}
       </div>
       {action}
     </div>
@@ -26,52 +31,56 @@ export function StatCard({
   label,
   value,
   hint,
-  icon,
+  emoji,
   tone = "default",
 }: {
   label: string;
   value: string;
   hint?: string;
-  icon?: React.ReactNode;
+  emoji?: string;
   tone?: "default" | "positive" | "negative" | "brand";
 }) {
   const toneClass =
     tone === "positive"
-      ? "text-emerald-600"
+      ? "text-brand-500"
       : tone === "negative"
-      ? "text-rose-600"
+      ? "text-ios-red"
       : tone === "brand"
-      ? "text-brand-600"
-      : "text-slate-900";
+      ? "text-ios-blue"
+      : "text-ink";
   return (
     <div className="card p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-slate-500">{label}</span>
-        {icon && <span className="text-slate-300">{icon}</span>}
+      <div className="flex items-center gap-1.5 text-[13px] font-medium text-subtle">
+        {emoji && <span className="text-base">{emoji}</span>}
+        {label}
       </div>
-      <div className={`mt-2 text-2xl font-bold ${toneClass}`}>{value}</div>
-      {hint && <div className="mt-1 text-xs text-slate-400">{hint}</div>}
+      <div className={`mt-1.5 text-[22px] font-bold tracking-tight ${toneClass}`}>
+        {value}
+      </div>
+      {hint && <div className="mt-0.5 text-[12px] text-subtle">{hint}</div>}
     </div>
   );
 }
 
 export function ProgressBar({
   value,
-  color = "#217048",
-  height = 8,
+  color = "#34c759",
+  height = 10,
+  animate = true,
 }: {
   value: number; // 0-100
   color?: string;
   height?: number;
+  animate?: boolean;
 }) {
   const v = Math.max(0, Math.min(100, value));
   return (
     <div
-      className="w-full overflow-hidden rounded-full bg-slate-100"
+      className="w-full overflow-hidden rounded-full bg-grouped"
       style={{ height }}
     >
       <div
-        className="h-full rounded-full transition-all"
+        className={`h-full rounded-full ${animate ? "bar-fill" : ""}`}
         style={{ width: `${v}%`, background: color }}
       />
     </div>
@@ -80,17 +89,22 @@ export function ProgressBar({
 
 export function SectionCard({
   title,
+  emoji,
   children,
   action,
 }: {
   title: string;
+  emoji?: string;
   children: React.ReactNode;
   action?: React.ReactNode;
 }) {
   return (
     <div className="card p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-semibold text-slate-900">{title}</h2>
+        <h2 className="flex items-center gap-2 text-[17px] font-bold text-ink">
+          {emoji && <span>{emoji}</span>}
+          {title}
+        </h2>
         {action}
       </div>
       {children}
@@ -100,7 +114,7 @@ export function SectionCard({
 
 export function EmptyState({ text }: { text: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-200 py-10 text-center text-sm text-slate-400">
+    <div className="rounded-3xl bg-grouped py-10 text-center text-[15px] text-subtle">
       {text}
     </div>
   );

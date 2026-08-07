@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, Plus, PiggyBank } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { peso, pct } from "@/lib/currency";
 import { goalProjection } from "@/lib/finance";
+import { goalEmoji } from "@/lib/types";
 import { PageHeader, StatCard, SectionCard, EmptyState, ProgressBar } from "@/components/ui";
+import { Confetti } from "@/components/Confetti";
 
 export default function SavingsPage() {
   const { data, ready, addGoal, updateGoal, deleteGoal } = useStore();
@@ -13,6 +15,7 @@ export default function SavingsPage() {
   const [target, setTarget] = useState("");
   const [current, setCurrent] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [celebrate, setCelebrate] = useState(0);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,18 +37,24 @@ export default function SavingsPage() {
   const totalSaved = goals.reduce((t, g) => t + g.current, 0);
   const totalTarget = goals.reduce((t, g) => t + g.target, 0);
 
-  function contribute(id: string, currentAmt: number) {
+  function contribute(id: string, currentAmt: number, targetAmt: number) {
     const input = prompt("How much to add to this goal? (₱)");
     if (!input) return;
     const amt = parseFloat(input.replace(/,/g, ""));
     if (!amt) return;
-    updateGoal(id, { current: currentAmt + amt });
+    const next = currentAmt + amt;
+    updateGoal(id, { current: next });
+    if (currentAmt < targetAmt && next >= targetAmt) {
+      setCelebrate((c) => c + 1); // 🎉 goal reached!
+    }
   }
 
   return (
     <div className="space-y-6">
+      <Confetti trigger={celebrate} />
       <PageHeader
         title="Savings Goals"
+        emoji="🎯"
         subtitle="Emergency fund, school fund, gadgets — track every dream."
       />
 
@@ -119,10 +128,10 @@ export default function SavingsPage() {
                   <div key={g.id} className="card p-5">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
-                          <PiggyBank size={18} />
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-grouped text-2xl">
+                          {goalEmoji(g.name)}
                         </span>
-                        <h3 className="font-semibold text-slate-900">
+                        <h3 className="text-[16px] font-bold text-ink">
                           {g.name}
                         </h3>
                       </div>
@@ -161,8 +170,8 @@ export default function SavingsPage() {
                     )}
 
                     <button
-                      onClick={() => contribute(g.id, g.current)}
-                      className="btn-ghost mt-3 w-full justify-center bg-brand-50 text-brand-700"
+                      onClick={() => contribute(g.id, g.current, g.target)}
+                      className="btn-ghost mt-3 w-full justify-center bg-brand-50 text-brand-600"
                     >
                       <Plus size={15} /> Add money
                     </button>

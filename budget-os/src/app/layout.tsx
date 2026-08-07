@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
-import { Shell } from "@/components/Shell";
+import { AppShell } from "@/components/AppShell";
 
 export const metadata: Metadata = {
   title: "Cris Budget OS — Family Money Dashboard",
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#217048",
+  viewportFit: "cover",
+  themeColor: "#f2f2f7",
 };
 
 export default function RootLayout({
@@ -24,7 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <StoreProvider>
-          <Shell>{children}</Shell>
+          <AppShell>{children}</AppShell>
         </StoreProvider>
       </body>
     </html>

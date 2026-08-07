@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { peso, pct } from "@/lib/currency";
 import { travelProjection } from "@/lib/finance";
 import { PageHeader, StatCard, SectionCard, EmptyState, ProgressBar } from "@/components/ui";
+import { Confetti } from "@/components/Confetti";
 
 export default function TravelPage() {
   const { data, ready, addTravel, updateTravel, deleteTravel } = useStore();
@@ -13,6 +14,7 @@ export default function TravelPage() {
   const [target, setTarget] = useState("");
   const [current, setCurrent] = useState("");
   const [travelDate, setTravelDate] = useState("");
+  const [celebrate, setCelebrate] = useState(0);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,12 +32,16 @@ export default function TravelPage() {
     setTravelDate("");
   }
 
-  function contribute(id: string, currentAmt: number) {
+  function contribute(id: string, currentAmt: number, targetAmt: number) {
     const input = prompt("How much to add to this travel fund? (₱)");
     if (!input) return;
     const amt = parseFloat(input.replace(/,/g, ""));
     if (!amt) return;
-    updateTravel(id, { current: currentAmt + amt });
+    const next = currentAmt + amt;
+    updateTravel(id, { current: next });
+    if (currentAmt < targetAmt && next >= targetAmt) {
+      setCelebrate((c) => c + 1); // 🎉 trip fully funded!
+    }
   }
 
   const funds = ready ? data.travel : [];
@@ -44,8 +50,10 @@ export default function TravelPage() {
 
   return (
     <div className="space-y-6">
+      <Confetti trigger={celebrate} />
       <PageHeader
         title="Travel Funds"
+        emoji="✈️"
         subtitle="Plan the trips your family deserves — one peso at a time."
       />
 
@@ -174,7 +182,7 @@ export default function TravelPage() {
                         </div>
                       </div>
                       <button
-                        onClick={() => contribute(f.id, f.current)}
+                        onClick={() => contribute(f.id, f.current, f.target)}
                         className="btn-ghost mt-3 w-full justify-center bg-sky-50 text-sky-700"
                       >
                         <Plus size={15} /> Add to fund

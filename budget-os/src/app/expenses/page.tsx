@@ -42,7 +42,8 @@ export default function ExpensesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Expense Tracking"
+        title="Expenses"
+        emoji="💸"
         subtitle="Every peso, categorized. Filter to see where your money goes."
       />
 

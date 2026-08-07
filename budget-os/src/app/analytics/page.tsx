@@ -43,6 +43,7 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Analytics"
+        emoji="📈"
         subtitle="Trends, comparisons and a simple 3-month forecast."
       />
 

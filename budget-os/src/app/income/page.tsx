@@ -33,7 +33,8 @@ export default function IncomePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Income Tracking"
+        title="Income"
+        emoji="💵"
         subtitle="Log salary, freelance, bonuses and side hustles."
       />
 

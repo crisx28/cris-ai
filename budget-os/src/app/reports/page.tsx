@@ -120,6 +120,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Reports"
+        emoji="📊"
         subtitle={`Financial summary for ${monthLabel(key)}.`}
         action={
           <button className="btn-primary" onClick={exportPDF} disabled={busy}>

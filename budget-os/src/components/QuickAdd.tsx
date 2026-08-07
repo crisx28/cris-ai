@@ -1,13 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Zap, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { parseQuickAdd, ParsedExpense } from "@/lib/parse";
 import { CATEGORY_META } from "@/lib/types";
 import { peso } from "@/lib/currency";
 import { useStore } from "@/lib/store";
 
-const EXAMPLES = ["Grocery 1250", "School Service 2600", "Electricity 5800", "Jollibee 890"];
+const EXAMPLES = [
+  "🍔 Jollibee 350",
+  "🛒 Grocery 1250",
+  "⛽ Gas 1000",
+  "📚 School 2600",
+  "💡 Electricity 5800",
+];
 
 export function QuickAdd() {
   const { addExpense } = useStore();
@@ -39,13 +45,13 @@ export function QuickAdd() {
   return (
     <div className="card p-5">
       <div className="mb-3 flex items-center gap-2">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
-          <Zap size={18} />
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-xl">
+          ⚡
         </span>
         <div>
-          <h2 className="font-semibold text-slate-900">Quick Add Expense</h2>
-          <p className="text-xs text-slate-400">
-            Just type it like a text message — we&apos;ll categorize it.
+          <h2 className="text-[16px] font-bold text-ink">Quick Add</h2>
+          <p className="text-[12px] text-subtle">
+            Type it like a text message — we&apos;ll sort it out.
           </p>
         </div>
       </div>
@@ -69,12 +75,10 @@ export function QuickAdd() {
       </form>
 
       {preview && (
-        <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-sm">
+        <div className="mt-3 flex animate-pop-in items-center justify-between rounded-2xl bg-grouped px-4 py-3 text-[15px]">
           <span className="flex items-center gap-2">
-            <span>{CATEGORY_META[preview.category].emoji}</span>
-            <span className="font-medium text-slate-700">
-              {preview.description}
-            </span>
+            <span className="text-xl">{CATEGORY_META[preview.category].emoji}</span>
+            <span className="font-medium text-ink">{preview.description}</span>
             <span
               className="chip"
               style={{
@@ -85,12 +89,12 @@ export function QuickAdd() {
               {preview.category}
             </span>
           </span>
-          <span className="font-bold text-slate-900">{peso(preview.amount)}</span>
+          <span className="font-bold text-ink">{peso(preview.amount)}</span>
         </div>
       )}
 
       {saved && (
-        <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        <div className="mt-3 flex animate-pop-in items-center gap-2 rounded-2xl bg-brand-50 px-4 py-3 text-[15px] font-medium text-brand-600">
           <Check size={16} /> Saved! 🎉
         </div>
       )}
@@ -100,8 +104,8 @@ export function QuickAdd() {
           {EXAMPLES.map((ex) => (
             <button
               key={ex}
-              onClick={() => onChange(ex)}
-              className="chip bg-slate-100 text-slate-500 hover:bg-slate-200"
+              onClick={() => onChange(ex.replace(/^[^\w]+/, ""))}
+              className="chip bg-grouped text-subtle active:scale-95 transition"
             >
               {ex}
             </button>

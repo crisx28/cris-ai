@@ -115,18 +115,40 @@ export const CATEGORY_META: Record<
   ExpenseCategory,
   { emoji: string; color: string }
 > = {
-  Food: { emoji: "🍚", color: "#ef4444" },
-  Grocery: { emoji: "🛒", color: "#f97316" },
-  Transportation: { emoji: "🚌", color: "#eab308" },
-  Utilities: { emoji: "💡", color: "#84cc16" },
-  Internet: { emoji: "🌐", color: "#22c55e" },
-  Mobile: { emoji: "📱", color: "#14b8a6" },
-  Rent: { emoji: "🏠", color: "#06b6d4" },
-  School: { emoji: "🎒", color: "#3b82f6" },
-  "Child Expenses": { emoji: "🧒", color: "#6366f1" },
-  "Debt Payment": { emoji: "💳", color: "#8b5cf6" },
-  Healthcare: { emoji: "🩺", color: "#ec4899" },
-  Entertainment: { emoji: "🎬", color: "#f43f5e" },
-  Travel: { emoji: "✈️", color: "#0ea5e9" },
-  Miscellaneous: { emoji: "📦", color: "#64748b" },
+  Food: { emoji: "🍔", color: "#ff3b30" },
+  Grocery: { emoji: "🛒", color: "#ff9500" },
+  Transportation: { emoji: "⛽", color: "#ffcc00" },
+  Utilities: { emoji: "💡", color: "#34c759" },
+  Internet: { emoji: "🌐", color: "#00c7be" },
+  Mobile: { emoji: "📱", color: "#30b0c7" },
+  Rent: { emoji: "🏠", color: "#0a84ff" },
+  School: { emoji: "📚", color: "#5e5ce6" },
+  "Child Expenses": { emoji: "👶", color: "#af52de" },
+  "Debt Payment": { emoji: "💳", color: "#ff2d55" },
+  Healthcare: { emoji: "🩺", color: "#ff375f" },
+  Entertainment: { emoji: "🎬", color: "#ff9500" },
+  Travel: { emoji: "✈️", color: "#0a84ff" },
+  Miscellaneous: { emoji: "📦", color: "#8e8e93" },
 };
+
+// Pick a friendly emoji for a savings goal / travel fund based on its name.
+export function goalEmoji(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("emergency")) return "🛡️";
+  if (n.includes("school") || n.includes("educ") || n.includes("tuition")) return "🎓";
+  if (n.includes("laptop") || n.includes("phone") || n.includes("gadget")) return "💻";
+  if (n.includes("home") || n.includes("house") || n.includes("bahay")) return "🏡";
+  if (n.includes("car") || n.includes("kotse")) return "🚗";
+  if (n.includes("wedding")) return "💍";
+  if (n.includes("baby") || n.includes("child")) return "👶";
+  if (
+    n.includes("trip") ||
+    n.includes("travel") ||
+    n.includes("china") ||
+    n.includes("japan") ||
+    n.includes("boracay") ||
+    n.includes("vacation")
+  )
+    return "✈️";
+  return "🎯";
+}

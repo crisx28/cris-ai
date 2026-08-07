@@ -67,8 +67,9 @@ export default function AssistantPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="AI Financial Assistant"
-        subtitle="Grounded in your real data. Works offline; smarter with a Claude API key."
+        title="Financial Coach"
+        emoji="🤖"
+        subtitle="Grounded in your real numbers. Ask me anything about your money."
       />
 
       <div className="card flex h-[calc(100vh-220px)] min-h-[420px] flex-col">

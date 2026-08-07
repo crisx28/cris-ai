@@ -52,6 +52,7 @@ export default function FixedExpensesPage() {
     <div className="space-y-6">
       <PageHeader
         title="Fixed Expenses"
+        emoji="🔁"
         subtitle="Recurring monthly bills. We auto-total your expected monthly outflow."
       />
 

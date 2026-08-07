@@ -49,6 +49,7 @@ export default function DebtsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Debt Tracker"
+        emoji="📉"
         subtitle="Two proven payoff strategies + your debt-free date."
       />
 
