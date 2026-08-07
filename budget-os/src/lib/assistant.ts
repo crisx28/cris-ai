@@ -10,12 +10,14 @@ import {
   avalancheOrder,
   categoryBreakdown,
   currentMonthKey,
+  dailySafeSpend,
   financialHealth,
   goalProjection,
   monthLabel,
   savingsRate,
   simulatePayoff,
   snowballOrder,
+  spendingComparison,
   totalExpenses,
   totalIncome,
   typicalMonthlySurplus,
@@ -39,6 +41,8 @@ function findCategory(q: string): ExpenseCategory | null {
   // common synonyms
   if (lower.includes("groceries")) return "Grocery";
   if (lower.includes("transpo") || lower.includes("gas") || lower.includes("grab")) return "Transportation";
+  if (lower.includes("child") || lower.includes("kid") || lower.includes("anak") || lower.includes("baby")) return "Child Expenses";
+  if (lower.includes("electric") || lower.includes("meralco") || lower.includes("water")) return "Utilities";
   if (lower.includes("bill")) return "Utilities";
   return null;
 }
@@ -56,8 +60,53 @@ export function answerQuestion(data: BudgetData, question: string): Answer {
   const income = totalIncome(data.incomes, key);
   const expenses = totalExpenses(data.expenses, key);
 
+  // --- How much can I safely spend today? ---
+  if (
+    (q.includes("safe") || q.includes("safely") || q.includes("today")) &&
+    (q.includes("spend") || q.includes("afford"))
+  ) {
+    const s = dailySafeSpend(data);
+    return {
+      text: `You can safely spend about ${peso(
+        s.perDay
+      )} per day. 💡\n\nThis leaves room for ${peso(
+        s.upcomingBills
+      )} in upcoming bills over the ${s.days} day${
+        s.days === 1 ? "" : "s"
+      } until your next payday (${s.payday}). Stay under this and you'll cruise to payday with breathing room.`,
+    };
+  }
+
+  // --- Why am I overspending? ---
+  if (
+    q.includes("overspend") ||
+    (q.includes("why") && (q.includes("spend") || q.includes("spending")))
+  ) {
+    const c = spendingComparison(data);
+    if (c.increases.length === 0) {
+      return {
+        text: `Good news — your spending isn't up vs last month. 🎉 You spent ${peso(
+          c.totalThis
+        )} this month vs ${peso(c.totalLast)} last month.`,
+      };
+    }
+    const lines = c.increases
+      .map(
+        (i) =>
+          `• ${i.category} is up ${Math.round(i.pctChange)}% (+${peso(i.delta)})`
+      )
+      .join("\n");
+    return {
+      text: `Here's what changed vs last month:\n${lines}\n\nOverall you're spending ${peso(
+        Math.abs(c.totalDelta)
+      )} ${c.totalDelta >= 0 ? "more" : "less"} than last month.${
+        c.recommendation ? `\n\n👉 ${c.recommendation}` : ""
+      }`,
+    };
+  }
+
   // --- Spending on a specific category ---
-  if ((q.includes("spend") || q.includes("spent")) && findCategory(q)) {
+  if ((q.includes("spend") || q.includes("spent") || q.includes("cost")) && findCategory(q)) {
     const cat = findCategory(q)!;
     const breakdown = categoryBreakdown(data.expenses, key);
     const found = breakdown.find((b) => b.category === cat);

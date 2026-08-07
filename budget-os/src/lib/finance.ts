@@ -318,3 +318,149 @@ export function travelProjection(fund: TravelFund): TravelProjection {
   }
   return { progress, stillNeeded, monthsLeft, recommendedMonthly };
 }
+
+// ---- Payday & Daily Safe Spend ------------------------------------------
+// Working parents are usually paid on fixed days (default: 15th & end of
+// month). These power the "how much can I safely spend today?" coaching.
+export const DEFAULT_PAYDAYS = [15, 30];
+
+function daysInMonth(year: number, month: number): number {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+export function nextPayday(paydays = DEFAULT_PAYDAYS, ref = new Date()): Date {
+  const today = ref.getDate();
+  const dim = daysInMonth(ref.getFullYear(), ref.getMonth());
+  const thisMonth = [...paydays]
+    .map((d) => Math.min(d, dim))
+    .sort((a, b) => a - b);
+  for (const d of thisMonth) {
+    if (d >= today)
+      return new Date(ref.getFullYear(), ref.getMonth(), d);
+  }
+  // First payday of next month.
+  const y = ref.getMonth() === 11 ? ref.getFullYear() + 1 : ref.getFullYear();
+  const m = (ref.getMonth() + 1) % 12;
+  const nextDim = daysInMonth(y, m);
+  const first = Math.min([...paydays].sort((a, b) => a - b)[0], nextDim);
+  return new Date(y, m, first);
+}
+
+export function daysUntilPayday(paydays = DEFAULT_PAYDAYS, ref = new Date()): number {
+  const start = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate());
+  const target = nextPayday(paydays, ref);
+  return Math.max(0, Math.round((target.getTime() - start.getTime()) / 86400000));
+}
+
+export interface SafeSpend {
+  perDay: number;
+  days: number;
+  upcomingBills: number;
+  available: number;
+  payday: string;
+}
+
+export function dailySafeSpend(data: BudgetData, ref = new Date()): SafeSpend {
+  const key = currentMonthKey(ref);
+  const available = remainingCash(data, key);
+  const days = Math.max(1, daysUntilPayday(DEFAULT_PAYDAYS, ref));
+  const today = ref.getDate();
+  // Bills still due before the next paycheck arrives.
+  const upcomingBills = data.fixedExpenses
+    .filter((f) => f.active && f.dueDay >= today)
+    .reduce((t, f) => t + f.amount, 0);
+  const spendable = Math.max(0, available - upcomingBills);
+  const perDay = Math.floor(spendable / days);
+  return {
+    perDay,
+    days: daysUntilPayday(DEFAULT_PAYDAYS, ref),
+    upcomingBills,
+    available,
+    payday: nextPayday(DEFAULT_PAYDAYS, ref).toLocaleDateString("en-PH", {
+      month: "long",
+      day: "numeric",
+    }),
+  };
+}
+
+// ---- "Why am I overspending?" comparison --------------------------------
+export interface SpendingComparison {
+  totalThis: number;
+  totalLast: number;
+  totalDelta: number;
+  increases: {
+    category: ExpenseCategory;
+    thisAmt: number;
+    lastAmt: number;
+    delta: number;
+    pctChange: number;
+  }[];
+  recommendation: string | null;
+}
+
+const DISCRETIONARY: ExpenseCategory[] = [
+  "Food",
+  "Entertainment",
+  "Grocery",
+  "Miscellaneous",
+];
+
+export function spendingComparison(data: BudgetData): SpendingComparison {
+  const series = trailingMonths(new Date(), 2);
+  const lastKey = series[0];
+  const thisKey = series[1];
+  const thisB = categoryBreakdown(data.expenses, thisKey);
+  const lastMap = new Map(
+    categoryBreakdown(data.expenses, lastKey).map((b) => [b.category, b.amount])
+  );
+  const increases = thisB
+    .map((b) => {
+      const lastAmt = lastMap.get(b.category) || 0;
+      return {
+        category: b.category,
+        thisAmt: b.amount,
+        lastAmt,
+        delta: b.amount - lastAmt,
+        pctChange: lastAmt > 0 ? ((b.amount - lastAmt) / lastAmt) * 100 : 100,
+      };
+    })
+    .filter((c) => c.delta > 50)
+    .sort((a, b) => b.delta - a.delta);
+
+  const totalThis = sum(inMonth(data.expenses, thisKey));
+  const totalLast = sum(inMonth(data.expenses, lastKey));
+
+  // Recommend trimming the biggest discretionary increase.
+  const target = increases.find((c) => DISCRETIONARY.includes(c.category));
+  let recommendation: string | null = null;
+  if (target) {
+    const trim = Math.min(
+      target.delta,
+      Math.max(500, Math.round(target.delta / 500) * 500)
+    );
+    recommendation = `Reduce ${target.category.toLowerCase()} expenses by about ₱${trim.toLocaleString(
+      "en-PH"
+    )} this month.`;
+  }
+
+  return {
+    totalThis,
+    totalLast,
+    totalDelta: totalThis - totalLast,
+    increases: increases.slice(0, 4),
+    recommendation,
+  };
+}
+
+// Estimate a completion date given how much is added each month.
+export function estimatedGoalDate(
+  remaining: number,
+  monthlyContribution: number
+): string | null {
+  if (remaining <= 0) return "Complete 🎉";
+  if (monthlyContribution <= 0) return null;
+  const months = Math.ceil(remaining / monthlyContribution);
+  const d = new Date();
+  d.setMonth(d.getMonth() + months);
+  return d.toLocaleDateString("en-PH", { month: "long", year: "numeric" });
+}

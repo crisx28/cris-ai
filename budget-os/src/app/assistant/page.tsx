@@ -12,12 +12,12 @@ interface Msg {
 }
 
 const SUGGESTIONS = [
+  "Can I afford a China trip next year?",
   "How much did I spend on food this month?",
-  "Which debt should I pay next?",
-  "Can I afford a 30,000 peso trip in December?",
-  "How much can I save monthly?",
-  "What are my top spending categories?",
+  "Which debt should I pay first?",
+  "How much can I safely spend today?",
   "Am I on track for my emergency fund?",
+  "How much did my child cost this month?",
 ];
 
 export default function AssistantPage() {
@@ -25,16 +25,23 @@ export default function AssistantPage() {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
-      text: "Kumusta! 👋 I'm Cris, your money assistant. Ask me anything about your budget — I read your actual numbers to answer. Try one of the suggestions below.",
+      text: "Kumusta! 👋 I'm your Financial Coach. I read your actual numbers, so I can give you real, personal answers — no judgment, just help. Tap a question below to get started.",
     },
   ]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, thinking]);
+
+  // Phase 9: one tap populates the input so the user can edit before sending.
+  function suggest(prompt: string) {
+    setInput(prompt);
+    inputRef.current?.focus();
+  }
 
   async function ask(question: string) {
     if (!question.trim() || !ready) return;
@@ -119,16 +126,16 @@ export default function AssistantPage() {
         </div>
 
         {messages.length <= 1 && (
-          <div className="border-t border-slate-100 px-5 py-3">
-            <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-slate-400">
-              <Sparkles size={13} /> Try asking
+          <div className="border-t border-hairline px-5 py-3">
+            <div className="mb-2 flex items-center gap-1.5 text-[12px] font-medium text-subtle">
+              <Sparkles size={13} /> Tap a question, then send
             </div>
             <div className="flex flex-wrap gap-2">
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
-                  onClick={() => ask(s)}
-                  className="chip bg-brand-50 text-brand-700 hover:bg-brand-100"
+                  onClick={() => suggest(s)}
+                  className="chip bg-brand-50 text-brand-700 transition active:scale-95 hover:bg-brand-100"
                 >
                   {s}
                 </button>
@@ -142,9 +149,10 @@ export default function AssistantPage() {
             e.preventDefault();
             ask(input);
           }}
-          className="flex gap-2 border-t border-slate-100 p-4"
+          className="flex gap-2 border-t border-hairline p-4"
         >
           <input
+            ref={inputRef}
             className="input"
             placeholder="Ask about your budget…"
             value={input}

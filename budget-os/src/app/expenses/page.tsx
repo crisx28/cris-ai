@@ -144,7 +144,10 @@ export default function ExpensesPage() {
             }
           >
             {list.length === 0 ? (
-              <EmptyState text="No expenses match this filter." />
+              <EmptyState
+                text="No expenses yet"
+                hint={'Try adding "Grocery 500" above — we\'ll categorize it automatically.'}
+              />
             ) : (
               <div className="max-h-[520px] divide-y divide-slate-100 overflow-y-auto">
                 {list.map((t) => (

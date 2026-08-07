@@ -118,7 +118,11 @@ export default function SavingsPage() {
         <div className="lg:col-span-2">
           {goals.length === 0 ? (
             <SectionCard title="Goals">
-              <EmptyState text="No goals yet. Create your first one!" />
+              <EmptyState
+                text="No goals yet"
+                emoji="🎯"
+                hint="Add an Emergency Fund or a dream — I'll tell you exactly how much to save each month."
+              />
             </SectionCard>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">

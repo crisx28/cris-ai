@@ -117,7 +117,11 @@ export default function TravelPage() {
         <div className="lg:col-span-2">
           {funds.length === 0 ? (
             <SectionCard title="Your Trips">
-              <EmptyState text="No trips planned yet. Dream big! ✈️" />
+              <EmptyState
+                text="No trips planned yet"
+                emoji="✈️"
+                hint="Plan a getaway and I'll show you the monthly savings to make it happen. Dream big!"
+              />
             </SectionCard>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">

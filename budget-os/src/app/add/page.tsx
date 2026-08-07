@@ -20,6 +20,33 @@ export default function AddPage() {
 
       <QuickAdd />
 
+      {/* Phase 7: Quick Add education */}
+      <div className="card p-5">
+        <p className="text-[15px] font-semibold text-ink">
+          ✨ Simply type: <span className="text-brand-600">Description + Amount</span>
+        </p>
+        <p className="mt-1 text-[13px] text-subtle">
+          Your AI Coach automatically categorizes every transaction — no menus,
+          no fuss.
+        </p>
+        <div className="mt-3 space-y-1.5">
+          {[
+            "🍔 Jollibee 350",
+            "🛒 Grocery 1200",
+            "📚 School 2600",
+            "💡 Electricity 5800",
+            "⛽ Gas 1000",
+          ].map((ex) => (
+            <div
+              key={ex}
+              className="rounded-2xl bg-grouped px-4 py-2.5 text-[15px] text-ink"
+            >
+              {ex}
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="space-y-2">
         <p className="section-title">Or add manually</p>
         <div className="grid grid-cols-2 gap-3">
