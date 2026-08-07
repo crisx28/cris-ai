@@ -24,6 +24,34 @@ data. 🎉
 
 ---
 
+## 📱 Install it as a phone app (PWA)
+
+Cris Budget OS is a **Progressive Web App** — it installs to your home screen
+with its own icon and opens fullscreen, just like a native app.
+
+- **iPhone (Safari):** open your deployed link → tap **Share** → **Add to Home
+  Screen**.
+- **Android (Chrome):** open the link → tap the **⋮** menu → **Install app**.
+
+The app works offline too (your data is stored on the device). Icons and the
+web manifest live in `public/` and `src/app/manifest.ts`. To regenerate the
+icons: `node scripts/make-icons.mjs` (dev-only).
+
+## 🔐 Login
+
+The app opens with a friendly welcome screen:
+
+- **Demo mode (default):** just enter your name and go — data is saved on the
+  device. Perfect for showing the app to someone.
+- **Email login:** works out of the box for demos; when you configure Supabase
+  (below), it becomes **real** secure sign-up / sign-in with per-user data
+  isolation. Tap the avatar on the home screen to sign out.
+
+> 💡 New here and want to sell this? Read **[PRESENTING.md](./PRESENTING.md)** —
+> a plain-English script for demoing and pricing this for clients.
+
+---
+
 ## 🧭 What's inside
 
 | Feature | Where |

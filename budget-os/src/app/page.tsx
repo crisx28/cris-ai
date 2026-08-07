@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useStore } from "@/lib/store";
+import { useAuth } from "@/lib/auth";
 import {
   currentMonthKey,
   financialHealth,
@@ -24,7 +25,10 @@ import { ProgressBar } from "@/components/ui";
 
 export default function HomePage() {
   const { data, ready } = useStore();
+  const { name, signOut } = useAuth();
   if (!ready) return <HomeSkeleton />;
+
+  const displayName = name || "Cris";
 
   const key = currentMonthKey();
   const income = totalIncome(data.incomes, key);
@@ -62,15 +66,26 @@ export default function HomePage() {
             {g.emoji} {g.text}
           </p>
           <h1 className="text-[26px] font-bold tracking-tight text-ink">
-            Kumusta, Cris 👋
+            Kumusta, {displayName} 👋
           </h1>
         </div>
-        <span
-          className="chip mt-1 font-semibold"
-          style={{ background: status.bg, color: status.color }}
-        >
-          {status.emoji} {status.label}
-        </span>
+        <div className="flex flex-col items-end gap-2">
+          <button
+            onClick={() => {
+              if (confirm("Sign out?")) signOut();
+            }}
+            aria-label="Profile"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-500 text-[15px] font-bold text-white shadow-sm transition active:scale-90"
+          >
+            {displayName.charAt(0).toUpperCase()}
+          </button>
+          <span
+            className="chip font-semibold"
+            style={{ background: status.bg, color: status.color }}
+          >
+            {status.emoji} {status.label}
+          </span>
+        </div>
       </div>
 
       {/* Available Cash hero */}
