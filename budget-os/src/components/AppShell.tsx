@@ -29,7 +29,7 @@ const TABS = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { name, signOut } = useAuth();
-  const { demoMode, exitDemo } = useStore();
+  const { demoMode, exitDemo, startFresh } = useStore();
   const isActive = (m: string[]) =>
     m.some((x) => (x === "/" ? pathname === "/" : pathname.startsWith(x)));
 
@@ -45,7 +45,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             ₱
           </div>
           <div className="leading-tight">
-            <div className="text-[15px] font-bold text-ink">Cris Budget OS</div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[15px] font-bold text-ink">Cris Budget OS</span>
+              {demoMode && (
+                <span className="rounded-md bg-brand-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-brand-700">
+                  DEMO
+                </span>
+              )}
+            </div>
             <div className="text-[11px] text-subtle">AI Financial Coach</div>
           </div>
         </Link>
@@ -100,16 +107,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* ---------- Main content ---------- */}
       <main className={`lg:pl-60 ${showCoach ? "xl:pr-80" : ""}`}>
         {demoMode && (
-          <div className="flex items-center justify-between gap-3 bg-brand-600 px-4 py-2.5 text-white lg:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-brand-600 px-4 py-2.5 text-white lg:px-8">
             <span className="text-[13px] font-medium">
-              ✨ You&apos;re exploring sample data
+              ✨ <b>Demo Mode</b> — You are viewing sample financial data.
             </span>
-            <button
-              onClick={exitDemo}
-              className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-semibold transition hover:bg-white/30 active:scale-95"
-            >
-              Exit Demo Mode
-            </button>
+            <span className="flex gap-2">
+              <button
+                onClick={startFresh}
+                className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-semibold transition hover:bg-white/30 active:scale-95"
+              >
+                Start Fresh
+              </button>
+              <button
+                onClick={exitDemo}
+                className="rounded-full bg-white px-3 py-1 text-[13px] font-semibold text-brand-700 transition hover:opacity-90 active:scale-95"
+              >
+                Exit Demo Mode
+              </button>
+            </span>
           </div>
         )}
         <div className="mx-auto max-w-[780px] px-4 py-6 pb-28 lg:px-8 lg:py-8 lg:pb-10">

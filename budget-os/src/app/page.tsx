@@ -31,10 +31,19 @@ import { HealthRing } from "@/components/HealthRing";
 import { IncomeExpenseChart } from "@/components/charts";
 
 export default function DashboardPage() {
-  const { data, ready, demoMode, enterDemo } = useStore();
+  const { data, ready, demoMode, enterDemo, mode } = useStore();
   const { name } = useAuth();
   const [showWhy, setShowWhy] = useState(false);
   if (!ready) return <Skeleton />;
+
+  const isEmpty =
+    mode === "user" &&
+    data.incomes.length === 0 &&
+    data.expenses.length === 0 &&
+    data.goals.length === 0 &&
+    data.debts.length === 0 &&
+    data.travel.length === 0 &&
+    data.fixedExpenses.length === 0;
 
   const displayName = name || "Cris";
   const key = currentMonthKey();
@@ -62,6 +71,56 @@ export default function DashboardPage() {
     .slice(0, 4);
 
   const recent = [...data.expenses].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 5);
+
+  // Start Fresh users see guidance instead of empty financial widgets.
+  if (isEmpty) {
+    return (
+      <div className="stagger space-y-5">
+        <OnboardingHero />
+        <div>
+          <p className="text-[14px] text-subtle">
+            {g.emoji} {g.text}
+          </p>
+          <h1 className="text-[28px] font-bold tracking-tight text-ink">
+            Let&apos;s set up your money, {displayName}
+          </h1>
+        </div>
+
+        <div className="card p-6 text-center">
+          <div className="text-4xl">💡</div>
+          <p className="mt-2 text-[17px] font-bold text-ink">Add your first expense</p>
+          <p className="mt-1 text-[14px] text-subtle">
+            Type it like a text message — we&apos;ll categorize it automatically.
+          </p>
+          <div className="mt-3 inline-block rounded-2xl bg-grouped px-4 py-2 text-[15px] font-semibold text-ink">
+            Try: “Grocery 500” 🛒
+          </div>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Link href="/add" className="btn-primary">
+              ➕ Add expense
+            </Link>
+            <Link
+              href="/add?receipt=1"
+              className="rounded-2xl bg-white px-4 py-3 text-[15px] font-semibold text-ink shadow-sm transition active:scale-[0.97]"
+            >
+              📸 Upload a receipt
+            </Link>
+          </div>
+        </div>
+
+        <QuickStart />
+
+        <div className="rounded-3xl border border-hairline bg-white p-4 text-center">
+          <p className="text-[14px] text-subtle">
+            Want to see what a full dashboard looks like first?
+          </p>
+          <button onClick={enterDemo} className="btn-ghost mt-1">
+            ✨ Explore the Demo Account
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="stagger space-y-5">
