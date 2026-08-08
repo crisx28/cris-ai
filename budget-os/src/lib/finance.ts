@@ -464,3 +464,190 @@ export function estimatedGoalDate(
   d.setMonth(d.getMonth() + months);
   return d.toLocaleDateString("en-PH", { month: "long", year: "numeric" });
 }
+
+// ---- Payday cycle analysis ----------------------------------------------
+// The most recent payday on or before `ref`.
+export function lastPayday(paydays = DEFAULT_PAYDAYS, ref = new Date()): Date {
+  const today = ref.getDate();
+  const dim = daysInMonth(ref.getFullYear(), ref.getMonth());
+  const thisMonth = [...paydays]
+    .map((d) => Math.min(d, dim))
+    .sort((a, b) => b - a);
+  for (const d of thisMonth) {
+    if (d <= today) return new Date(ref.getFullYear(), ref.getMonth(), d);
+  }
+  // Last payday of the previous month.
+  const y = ref.getMonth() === 0 ? ref.getFullYear() - 1 : ref.getFullYear();
+  const m = (ref.getMonth() + 11) % 12;
+  const prevDim = daysInMonth(y, m);
+  const last = Math.min(Math.max(...paydays), prevDim);
+  return new Date(y, m, last);
+}
+
+function daysBetween(a: Date, b: Date): number {
+  return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86400000));
+}
+
+function spentBetween(expenses: Expense[], from: Date, to: Date): number {
+  const f = from.getTime();
+  const t = to.getTime();
+  return expenses.reduce((sum, e) => {
+    const d = new Date(e.date).getTime();
+    return d >= f && d < t ? sum + e.amount : sum;
+  }, 0);
+}
+
+export interface PaydayCycle {
+  cycleStart: Date;
+  nextPayday: Date;
+  daysSince: number;
+  daysUntil: number;
+  spentThisCycle: number;
+  spentPrevCycle: number;
+  cycleDeltaPct: number;
+  burnRate: number; // avg spend per day this cycle
+  projectedCycleSpend: number;
+  remainingBeforePayday: number;
+}
+
+export function paydayCycleAnalysis(
+  data: BudgetData,
+  ref = new Date()
+): PaydayCycle {
+  const cycleStart = lastPayday(DEFAULT_PAYDAYS, ref);
+  const next = nextPayday(DEFAULT_PAYDAYS, ref);
+  const daysSince = Math.max(1, daysBetween(cycleStart, ref));
+  const daysUntil = daysUntilPayday(DEFAULT_PAYDAYS, ref);
+  const cycleLen = Math.max(1, daysBetween(cycleStart, next));
+
+  const spentThisCycle = spentBetween(
+    data.expenses,
+    cycleStart,
+    new Date(ref.getFullYear(), ref.getMonth(), ref.getDate() + 1)
+  );
+  const prevStart = lastPayday(
+    DEFAULT_PAYDAYS,
+    new Date(cycleStart.getTime() - 86400000)
+  );
+  const spentPrevCycle = spentBetween(data.expenses, prevStart, cycleStart);
+
+  const burnRate = spentThisCycle / daysSince;
+  const safe = dailySafeSpend(data, ref);
+
+  return {
+    cycleStart,
+    nextPayday: next,
+    daysSince,
+    daysUntil,
+    spentThisCycle,
+    spentPrevCycle,
+    cycleDeltaPct:
+      spentPrevCycle > 0
+        ? ((spentThisCycle - spentPrevCycle) / spentPrevCycle) * 100
+        : 0,
+    burnRate,
+    projectedCycleSpend: Math.round(burnRate * cycleLen),
+    remainingBeforePayday: Math.max(0, safe.available - safe.upcomingBills),
+  };
+}
+
+// ---- Full category comparison (every category, this vs last) -------------
+export interface CategoryDelta {
+  category: ExpenseCategory;
+  thisAmt: number;
+  lastAmt: number;
+  delta: number;
+  pctChange: number;
+}
+
+export function categoryComparisonFull(data: BudgetData): CategoryDelta[] {
+  const [lastKey, thisKey] = trailingMonths(new Date(), 2);
+  const thisMap = new Map(
+    categoryBreakdown(data.expenses, thisKey).map((b) => [b.category, b.amount])
+  );
+  const lastMap = new Map(
+    categoryBreakdown(data.expenses, lastKey).map((b) => [b.category, b.amount])
+  );
+  const cats = new Set<ExpenseCategory>([
+    ...Array.from(thisMap.keys()),
+    ...Array.from(lastMap.keys()),
+  ]);
+  return Array.from(cats)
+    .map((category) => {
+      const thisAmt = thisMap.get(category) || 0;
+      const lastAmt = lastMap.get(category) || 0;
+      return {
+        category,
+        thisAmt,
+        lastAmt,
+        delta: thisAmt - lastAmt,
+        pctChange: lastAmt > 0 ? ((thisAmt - lastAmt) / lastAmt) * 100 : thisAmt > 0 ? 100 : 0,
+      };
+    })
+    .sort((a, b) => b.thisAmt - a.thisAmt);
+}
+
+// Monthly total for a single category (for the Parent Dashboard).
+export function categoryMonthlySeries(
+  data: BudgetData,
+  category: ExpenseCategory,
+  n = 6
+): { key: string; label: string; amount: number }[] {
+  return trailingMonths(new Date(), n).map((key) => ({
+    key,
+    label: monthLabel(key),
+    amount: inMonth(data.expenses, key)
+      .filter((e) => e.category === category)
+      .reduce((t, e) => t + e.amount, 0),
+  }));
+}
+
+// Cumulative savings (running total of monthly net) for a growth chart.
+export function savingsGrowthSeries(
+  data: BudgetData,
+  n = 6
+): { label: string; total: number }[] {
+  let running = 0;
+  return monthlySeries(data, n).map((p) => {
+    running += p.net;
+    return { label: p.label, total: Math.round(running) };
+  });
+}
+
+// Projected total debt balance month-by-month (avalanche), for a payoff chart.
+export function debtPayoffProjection(
+  debts: Debt[],
+  maxMonths = 36
+): { label: string; balance: number }[] {
+  const working = avalancheOrder(debts).map((d) => ({ ...d }));
+  const basePayment = working.reduce((t, d) => t + d.monthlyPayment, 0);
+  const series: { label: string; balance: number }[] = [];
+  const now = new Date();
+
+  series.push({
+    label: now.toLocaleDateString("en-PH", { month: "short" }),
+    balance: Math.round(working.reduce((t, d) => t + d.balance, 0)),
+  });
+
+  for (let m = 1; m <= maxMonths; m++) {
+    for (const d of working) {
+      if (d.balance > 0) d.balance += d.balance * (d.interestRate / 100);
+    }
+    let pool = basePayment;
+    for (const d of working) {
+      if (d.balance <= 0 || pool <= 0) continue;
+      const pay = Math.min(pool, d.balance);
+      d.balance -= pay;
+      pool -= pay;
+      if (d.balance < 0.5) d.balance = 0;
+    }
+    const total = Math.round(working.reduce((t, d) => t + d.balance, 0));
+    const dt = new Date(now.getFullYear(), now.getMonth() + m, 1);
+    series.push({
+      label: dt.toLocaleDateString("en-PH", { month: "short" }),
+      balance: total,
+    });
+    if (total <= 0) break;
+  }
+  return series;
+}

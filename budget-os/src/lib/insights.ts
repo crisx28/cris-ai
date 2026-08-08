@@ -1,13 +1,18 @@
 // Friendly coach logic: time-based greeting, health status with the
 // 🟢🟡🟠🔴 system, dynamic AI insights, and the home Coach message.
 
-import { peso } from "./currency";
+import { peso, pct } from "./currency";
 import {
   categoryBreakdown,
+  categoryComparisonFull,
   currentMonthKey,
   goalProjection,
+  monthLabel,
   monthlySeries,
   savingsRate,
+  spendingComparison,
+  totalExpenses,
+  totalIncome,
   travelProjection,
   typicalMonthlySurplus,
 } from "./finance";
@@ -168,4 +173,101 @@ export function coachMessage(data: BudgetData): string {
     )} to a goal builds real momentum.`;
   }
   return `Money's a little tight this month. Let's look at your top 2 spending categories together — small trims add up fast. You've got this. 💚`;
+}
+
+// ---- Report-grade natural-language insights ------------------------------
+// Fuller, review-style explanations: why spending changed, biggest category,
+// where to save, and positive habits to celebrate.
+export interface ReviewInsight {
+  emoji: string;
+  title: string;
+  text: string;
+  tone: "good" | "warn" | "info";
+}
+
+export function reviewInsights(data: BudgetData): ReviewInsight[] {
+  const key = currentMonthKey();
+  const out: ReviewInsight[] = [];
+  const income = totalIncome(data.incomes, key);
+  const expenses = totalExpenses(data.expenses, key);
+  const cmp = spendingComparison(data);
+  const cats = categoryComparisonFull(data);
+  const rate = savingsRate(data, key);
+
+  // Why spending changed
+  if (cmp.increases.length > 0 && cmp.totalDelta > 0) {
+    const top = cmp.increases[0];
+    out.push({
+      emoji: "🔎",
+      title: "Why your spending changed",
+      text: `You spent ${peso(Math.abs(cmp.totalDelta))} more than last month. The biggest driver was ${top.category} (+${peso(
+        top.delta
+      )}, up ${Math.round(top.pctChange)}%).`,
+      tone: "warn",
+    });
+  } else {
+    out.push({
+      emoji: "✅",
+      title: "Spending is under control",
+      text: `You spent ${peso(
+        Math.abs(cmp.totalDelta)
+      )} ${cmp.totalDelta <= 0 ? "less" : "more"} than last month. Consistency like this is exactly how families get ahead.`,
+      tone: "good",
+    });
+  }
+
+  // Biggest spending category
+  const biggest = cats[0];
+  if (biggest && biggest.thisAmt > 0) {
+    out.push({
+      emoji: "🏆",
+      title: "Your biggest category",
+      text: `${biggest.category} is your largest expense this month at ${peso(
+        biggest.thisAmt
+      )} — ${pct(expenses ? (biggest.thisAmt / expenses) * 100 : 0)} of your spending.`,
+      tone: "info",
+    });
+  }
+
+  // Areas to save
+  if (cmp.recommendation) {
+    out.push({
+      emoji: "💡",
+      title: "Where you can save",
+      text: cmp.recommendation + " Redirecting that to a goal would speed things up nicely.",
+      tone: "info",
+    });
+  }
+
+  // Positive habits
+  const habits: string[] = [];
+  if (rate >= 15) habits.push(`saved ${Math.round(rate)}% of your income`);
+  const debtPaid = categoryBreakdown(data.expenses, key).find(
+    (b) => b.category === "Debt Payment"
+  );
+  if (debtPaid && debtPaid.amount > 0)
+    habits.push(`paid ${peso(debtPaid.amount)} toward debt`);
+  const funded = data.goals.filter((g) => g.current / (g.target || 1) >= 0.5).length;
+  if (funded > 0) habits.push(`${funded} goal${funded > 1 ? "s" : ""} past the halfway mark`);
+  if (habits.length > 0) {
+    out.push({
+      emoji: "🎉",
+      title: "Positive habits this month",
+      text: `Great job — this month you ${habits.join(", ")}. Keep it up!`,
+      tone: "good",
+    });
+  }
+
+  return out;
+}
+
+// A plain-text summary used inside exported reports (PDF/Excel/CSV).
+export function reviewSummaryText(data: BudgetData): string {
+  const key = currentMonthKey();
+  return (
+    `Financial Review — ${monthLabel(key)}\n` +
+    reviewInsights(data)
+      .map((i) => `- ${i.title}: ${i.text}`)
+      .join("\n")
+  );
 }
