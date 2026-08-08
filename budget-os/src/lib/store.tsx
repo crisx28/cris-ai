@@ -24,9 +24,12 @@ import {
 } from "./types";
 import { generateSeed } from "./seed";
 
-const STORAGE_KEY = "cris-budget-os:v1";
-const DEMO_KEY = "cris-budget-os:demo";
-const BACKUP_KEY = "cris-budget-os:backup";
+// Storage is split so demo data can NEVER mix with the user's real data.
+const MODE_KEY = "cris-budget-os:mode"; // "user" | "demo"
+const USER_KEY = "cris-budget-os:v1"; // the user's own financial data
+const DEMO_DATA_KEY = "cris-budget-os:demo-data"; // sample data, isolated
+
+type Mode = "user" | "demo" | null; // null = first launch, choice not made yet
 
 function uid(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random()
@@ -55,7 +58,9 @@ interface StoreContextValue {
   deleteTravel: (id: string) => void;
   resetToSample: () => void;
   clearAll: () => void;
+  mode: Mode;
   demoMode: boolean;
+  startFresh: () => void;
   enterDemo: () => void;
   exitDemo: () => void;
 }
@@ -74,41 +79,54 @@ const EMPTY: BudgetData = {
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<BudgetData>(EMPTY);
   const [ready, setReady] = useState(false);
-  const [demoMode, setDemoMode] = useState(false);
+  const [mode, setMode] = useState<Mode>(null);
 
-  // Load on mount (client only).
+  // Load on mount (client only). Never auto-seeds into the user's data — the
+  // choice screen decides between Start Fresh and Demo.
   useEffect(() => {
     try {
-      setDemoMode(!!localStorage.getItem(DEMO_KEY));
-    } catch {
-      /* ignore */
-    }
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        setData(JSON.parse(raw));
+      const saved = localStorage.getItem(MODE_KEY) as Mode;
+      if (saved === "demo") {
+        const raw = localStorage.getItem(DEMO_DATA_KEY);
+        const demo = raw ? JSON.parse(raw) : generateSeed();
+        if (!raw) localStorage.setItem(DEMO_DATA_KEY, JSON.stringify(demo));
+        setData(demo);
+        setMode("demo");
+      } else if (saved === "user") {
+        const raw = localStorage.getItem(USER_KEY);
+        setData(raw ? JSON.parse(raw) : EMPTY);
+        setMode("user");
       } else {
-        const seeded = generateSeed();
-        setData(seeded);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+        // Migration: existing installs already have data under USER_KEY and no
+        // mode flag — keep it as their own data so they skip the choice.
+        const legacy = localStorage.getItem(USER_KEY);
+        if (legacy) {
+          setData(JSON.parse(legacy));
+          setMode("user");
+          localStorage.setItem(MODE_KEY, "user");
+        } else {
+          setMode(null); // first launch → show the choice screen
+        }
       }
     } catch {
-      setData(generateSeed());
+      setMode(null);
     } finally {
       setReady(true);
     }
   }, []);
 
-  // Persist on every change.
+  // Persist to the ACTIVE store only, so demo edits never touch user data.
   useEffect(() => {
-    if (ready) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch {
-        /* storage full or unavailable — ignore */
-      }
+    if (!ready || !mode) return;
+    try {
+      localStorage.setItem(
+        mode === "demo" ? DEMO_DATA_KEY : USER_KEY,
+        JSON.stringify(data)
+      );
+    } catch {
+      /* storage full or unavailable — ignore */
     }
-  }, [data, ready]);
+  }, [data, ready, mode]);
 
   const update = useCallback(
     (fn: (d: BudgetData) => BudgetData) => setData((d) => fn(d)),
@@ -171,35 +189,50 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         })),
       deleteTravel: (id) =>
         update((d) => ({ ...d, travel: d.travel.filter((x) => x.id !== id) })),
-      resetToSample: () => {
-        const seeded = generateSeed();
-        setData(seeded);
-      },
+      resetToSample: () => setData(generateSeed()),
       clearAll: () => setData(EMPTY),
-      demoMode,
-      enterDemo: () => {
+      mode,
+      demoMode: mode === "demo",
+      // Begin a clean, empty personal profile.
+      startFresh: () => {
         try {
-          if (!demoMode) localStorage.setItem(BACKUP_KEY, JSON.stringify(data));
-          localStorage.setItem(DEMO_KEY, "1");
+          localStorage.setItem(MODE_KEY, "user");
+          localStorage.setItem(USER_KEY, JSON.stringify(EMPTY));
         } catch {
           /* ignore */
         }
-        setData(generateSeed());
-        setDemoMode(true);
+        setData(EMPTY);
+        setMode("user");
       },
-      exitDemo: () => {
+      // Explore isolated sample data.
+      enterDemo: () => {
+        let demo: BudgetData;
         try {
-          const raw = localStorage.getItem(BACKUP_KEY);
-          setData(raw ? JSON.parse(raw) : EMPTY);
-          localStorage.removeItem(BACKUP_KEY);
-          localStorage.removeItem(DEMO_KEY);
+          const raw = localStorage.getItem(DEMO_DATA_KEY);
+          demo = raw ? JSON.parse(raw) : generateSeed();
+          localStorage.setItem(MODE_KEY, "demo");
+          localStorage.setItem(DEMO_DATA_KEY, JSON.stringify(demo));
         } catch {
-          setData(EMPTY);
+          demo = generateSeed();
         }
-        setDemoMode(false);
+        setData(demo);
+        setMode("demo");
+      },
+      // Leave demo and return to the user's own data (kept separate).
+      exitDemo: () => {
+        let own: BudgetData = EMPTY;
+        try {
+          const raw = localStorage.getItem(USER_KEY);
+          own = raw ? JSON.parse(raw) : EMPTY;
+          localStorage.setItem(MODE_KEY, "user");
+        } catch {
+          own = EMPTY;
+        }
+        setData(own);
+        setMode("user");
       },
     }),
-    [data, ready, update, demoMode]
+    [data, ready, update, mode]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { useStore } from "@/lib/store";
+import { ModeChoice } from "@/components/ModeChoice";
 
-// Shows a polished welcome/login screen until the user is signed in.
+// Gates the app: sign in → choose Start Fresh / Demo → app.
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { ready, signedIn } = useAuth();
+  const { ready: storeReady, mode } = useStore();
 
-  if (!ready) {
+  if (!ready || !storeReady) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-10 w-10 animate-pulse rounded-2xl bg-brand-500" />
@@ -16,6 +19,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   }
 
   if (!signedIn) return <LoginScreen />;
+  if (mode === null) return <ModeChoice />; // first launch: pick a starting point
   return <>{children}</>;
 }
 
