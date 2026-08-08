@@ -112,10 +112,20 @@ export function SectionCard({
   );
 }
 
-export function EmptyState({ text }: { text: string }) {
+export function EmptyState({
+  text,
+  emoji = "💡",
+  hint,
+}: {
+  text: string;
+  emoji?: string;
+  hint?: string;
+}) {
   return (
-    <div className="rounded-3xl bg-grouped py-10 text-center text-[15px] text-subtle">
-      {text}
+    <div className="rounded-3xl bg-grouped px-6 py-10 text-center">
+      <div className="text-3xl">{emoji}</div>
+      <p className="mt-2 text-[15px] font-semibold text-ink">{text}</p>
+      {hint && <p className="mt-1 text-[13px] leading-relaxed text-subtle">{hint}</p>}
     </div>
   );
 }

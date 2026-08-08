@@ -110,7 +110,11 @@ export default function IncomePage() {
         <div className="lg:col-span-2">
           <SectionCard title="Income History">
             {list.length === 0 ? (
-              <EmptyState text="No income logged yet." />
+              <EmptyState
+                text="No income yet"
+                emoji="💵"
+                hint="Add your salary or a freelance payment to see your available cash and savings rate."
+              />
             ) : (
               <div className="divide-y divide-slate-100">
                 {list.map((i) => (
