@@ -137,6 +137,140 @@ export function TrendArea({
   );
 }
 
+export function CategoryCompareBar({
+  data,
+}: {
+  data: { category: string; thisAmt: number; lastAmt: number }[];
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={Math.max(220, data.length * 44)}>
+      <BarChart data={data} layout="vertical" barGap={2} margin={{ left: 8 }}>
+        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#eef2f6" />
+        <XAxis
+          type="number"
+          tick={AXIS}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(v) => pesoCompact(v)}
+        />
+        <YAxis
+          type="category"
+          dataKey="category"
+          tick={{ fontSize: 12, fill: "#475569" }}
+          axisLine={false}
+          tickLine={false}
+          width={92}
+        />
+        <Tooltip content={<MoneyTooltip />} cursor={{ fill: "#f1f5f9" }} />
+        <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
+        <Bar dataKey="lastAmt" name="Last month" fill="#cbd5e1" radius={[0, 6, 6, 0]} />
+        <Bar dataKey="thisAmt" name="This month" fill="#217048" radius={[0, 6, 6, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function SavingsGrowthChart({
+  data,
+}: {
+  data: { label: string; total: number }[];
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={240}>
+      <AreaChart data={data}>
+        <defs>
+          <linearGradient id="grad-growth" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#34c759" stopOpacity={0.35} />
+            <stop offset="95%" stopColor="#34c759" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef2f6" />
+        <XAxis dataKey="label" tick={AXIS} axisLine={false} tickLine={false} />
+        <YAxis
+          tick={AXIS}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(v) => pesoCompact(v)}
+          width={54}
+        />
+        <Tooltip content={<MoneyTooltip />} />
+        <Area
+          type="monotone"
+          dataKey="total"
+          name="Cumulative savings"
+          stroke="#217048"
+          strokeWidth={2.5}
+          fill="url(#grad-growth)"
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function DebtPayoffChart({
+  data,
+}: {
+  data: { label: string; balance: number }[];
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={240}>
+      <AreaChart data={data}>
+        <defs>
+          <linearGradient id="grad-debt" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.35} />
+            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef2f6" />
+        <XAxis dataKey="label" tick={AXIS} axisLine={false} tickLine={false} minTickGap={16} />
+        <YAxis
+          tick={AXIS}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(v) => pesoCompact(v)}
+          width={54}
+        />
+        <Tooltip content={<MoneyTooltip />} />
+        <Area
+          type="monotone"
+          dataKey="balance"
+          name="Debt balance"
+          stroke="#8b5cf6"
+          strokeWidth={2.5}
+          fill="url(#grad-debt)"
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function ParentSpendChart({
+  data,
+}: {
+  data: { label: string; child: number; school: number; food: number }[];
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={260}>
+      <BarChart data={data} barGap={3}>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef2f6" />
+        <XAxis dataKey="label" tick={AXIS} axisLine={false} tickLine={false} />
+        <YAxis
+          tick={AXIS}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(v) => pesoCompact(v)}
+          width={54}
+        />
+        <Tooltip content={<MoneyTooltip />} cursor={{ fill: "#f1f5f9" }} />
+        <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
+        <Bar dataKey="child" name="Child" fill="#af52de" radius={[5, 5, 0, 0]} />
+        <Bar dataKey="school" name="School" fill="#5e5ce6" radius={[5, 5, 0, 0]} />
+        <Bar dataKey="food" name="Food" fill="#ff3b30" radius={[5, 5, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
 export function SavingsLine({
   data,
 }: {
