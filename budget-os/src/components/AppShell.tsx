@@ -3,30 +3,33 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { useStore } from "@/lib/store";
 import { CoachPanel } from "@/components/CoachPanel";
 
 // Desktop left-sidebar navigation.
 const NAV = [
-  { href: "/", label: "Dashboard", emoji: "🏠", match: ["/"] },
-  { href: "/expenses", label: "Expenses", emoji: "💸", match: ["/expenses", "/income", "/fixed"] },
-  { href: "/savings", label: "Goals", emoji: "🎯", match: ["/savings", "/travel", "/debts"] },
-  { href: "/reports", label: "Reports", emoji: "📊", match: ["/reports", "/analytics"] },
-  { href: "/assistant", label: "AI Coach", emoji: "🤖", match: ["/assistant"] },
-  { href: "/settings", label: "Settings", emoji: "⚙️", match: ["/settings"] },
+  { href: "/", label: "Dashboard", emoji: "🏠", match: ["/"], tour: "" },
+  { href: "/expenses", label: "Expenses", emoji: "💸", match: ["/expenses", "/income", "/fixed"], tour: "nav-expenses" },
+  { href: "/savings", label: "Goals", emoji: "🎯", match: ["/savings", "/travel", "/debts"], tour: "" },
+  { href: "/reports", label: "Reports", emoji: "📊", match: ["/reports", "/analytics"], tour: "nav-reports" },
+  { href: "/assistant", label: "AI Coach", emoji: "🤖", match: ["/assistant"], tour: "" },
+  { href: "/learn", label: "Learn", emoji: "❓", match: ["/learn"], tour: "" },
+  { href: "/settings", label: "Settings", emoji: "⚙️", match: ["/settings"], tour: "" },
 ];
 
 // Mobile bottom tab bar.
 const TABS = [
-  { href: "/", label: "Home", emoji: "🏠", match: ["/"] },
-  { href: "/add", label: "Add", emoji: "➕", center: true, match: ["/add"] },
-  { href: "/assistant", label: "Coach", emoji: "🤖", match: ["/assistant"] },
-  { href: "/savings", label: "Goals", emoji: "🎯", match: ["/savings", "/travel", "/debts"] },
-  { href: "/reports", label: "Reports", emoji: "📊", match: ["/reports", "/analytics"] },
+  { href: "/", label: "Home", emoji: "🏠", match: ["/"], tour: "" },
+  { href: "/add", label: "Add", emoji: "➕", center: true, match: ["/add"], tour: "nav-expenses" },
+  { href: "/assistant", label: "Coach", emoji: "🤖", match: ["/assistant"], tour: "" },
+  { href: "/savings", label: "Goals", emoji: "🎯", match: ["/savings", "/travel", "/debts"], tour: "" },
+  { href: "/reports", label: "Reports", emoji: "📊", match: ["/reports", "/analytics"], tour: "nav-reports" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { name, signOut } = useAuth();
+  const { demoMode, exitDemo } = useStore();
   const isActive = (m: string[]) =>
     m.some((x) => (x === "/" ? pathname === "/" : pathname.startsWith(x)));
 
@@ -54,6 +57,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={n.href}
                 href={n.href}
+                data-tour={n.tour || undefined}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition ${
                   active
                     ? "bg-brand-50 text-brand-700"
@@ -85,13 +89,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* ---------- Desktop right coach panel ---------- */}
       {showCoach && (
-        <aside className="z-30 hidden border-l border-hairline bg-white px-4 py-5 xl:fixed xl:inset-y-0 xl:right-0 xl:flex xl:w-80 xl:flex-col xl:overflow-y-auto">
+        <aside
+          data-tour="ai-coach"
+          className="z-30 hidden border-l border-hairline bg-white px-4 py-5 xl:fixed xl:inset-y-0 xl:right-0 xl:flex xl:w-80 xl:flex-col xl:overflow-y-auto"
+        >
           <CoachPanel />
         </aside>
       )}
 
       {/* ---------- Main content ---------- */}
       <main className={`lg:pl-60 ${showCoach ? "xl:pr-80" : ""}`}>
+        {demoMode && (
+          <div className="flex items-center justify-between gap-3 bg-brand-600 px-4 py-2.5 text-white lg:px-8">
+            <span className="text-[13px] font-medium">
+              ✨ You&apos;re exploring sample data
+            </span>
+            <button
+              onClick={exitDemo}
+              className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-semibold transition hover:bg-white/30 active:scale-95"
+            >
+              Exit Demo Mode
+            </button>
+          </div>
+        )}
         <div className="mx-auto max-w-[780px] px-4 py-6 pb-28 lg:px-8 lg:py-8 lg:pb-10">
           {children}
         </div>
@@ -108,6 +128,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   key={tab.href}
                   href={tab.href}
                   aria-label="Add"
+                  data-tour={tab.tour || undefined}
                   className="flex h-12 w-12 -translate-y-1 items-center justify-center rounded-full bg-brand-500 text-white shadow-lg transition-all duration-200 active:scale-90"
                 >
                   <span className="text-2xl leading-none">+</span>
@@ -118,6 +139,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={tab.href}
                 href={tab.href}
+                data-tour={tab.tour || undefined}
                 className="flex w-14 flex-col items-center gap-0.5 py-1 transition active:scale-90"
               >
                 <span className={`text-xl transition ${active ? "scale-110" : "opacity-40 grayscale"}`}>

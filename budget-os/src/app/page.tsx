@@ -25,12 +25,13 @@ import { CATEGORY_META, goalEmoji } from "@/lib/types";
 import { StatCard, ProgressBar } from "@/components/ui";
 import { GoalProgressCard } from "@/components/GoalProgressCard";
 import { CoachHeroCard } from "@/components/CoachHeroCard";
-import { OnboardingCard } from "@/components/OnboardingCard";
+import { OnboardingHero } from "@/components/OnboardingHero";
+import { QuickStart } from "@/components/QuickStart";
 import { HealthRing } from "@/components/HealthRing";
 import { IncomeExpenseChart } from "@/components/charts";
 
 export default function DashboardPage() {
-  const { data, ready } = useStore();
+  const { data, ready, demoMode, enterDemo } = useStore();
   const { name } = useAuth();
   const [showWhy, setShowWhy] = useState(false);
   if (!ready) return <Skeleton />;
@@ -64,7 +65,7 @@ export default function DashboardPage() {
 
   return (
     <div className="stagger space-y-5">
-      <OnboardingCard />
+      <OnboardingHero />
 
       {/* Header */}
       <div className="flex items-end justify-between">
@@ -84,6 +85,25 @@ export default function DashboardPage() {
           {status.emoji} {status.label}
           <ChevronDown size={14} className={`transition ${showWhy ? "rotate-180" : ""}`} />
         </button>
+      </div>
+
+      {/* Quick Start + demo */}
+      <QuickStart />
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/assistant"
+          className="rounded-full border border-hairline bg-white px-4 py-2 text-[13px] font-semibold text-ink transition hover:border-brand-300 active:scale-95"
+        >
+          🤖 Show Me Around
+        </Link>
+        {!demoMode && (
+          <button
+            onClick={enterDemo}
+            className="rounded-full border border-hairline bg-white px-4 py-2 text-[13px] font-semibold text-ink transition hover:border-brand-300 active:scale-95"
+          >
+            ✨ Explore Sample Data
+          </button>
+        )}
       </div>
 
       {showWhy && (
@@ -119,15 +139,19 @@ export default function DashboardPage() {
 
       {/* Top row — 4 key stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          label="Available Cash"
-          emoji="💰"
-          value={peso(available)}
-          tone={available >= 0 ? "positive" : "negative"}
-        />
+        <div data-tour="available-cash">
+          <StatCard
+            label="Available Cash"
+            emoji="💰"
+            value={peso(available)}
+            tone={available >= 0 ? "positive" : "negative"}
+          />
+        </div>
         <StatCard label="Monthly Income" emoji="💵" value={peso(income)} />
         <StatCard label="Monthly Expenses" emoji="💸" value={peso(expenses)} />
-        <StatCard label="Debt Balance" emoji="📉" value={peso(debt)} />
+        <div data-tour="debt">
+          <StatCard label="Debt Balance" emoji="📉" value={peso(debt)} />
+        </div>
       </div>
 
       {/* Daily Safe Spend — signature coaching stat */}
@@ -149,7 +173,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Middle row — goals + health */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div data-tour="goals" className="grid gap-4 lg:grid-cols-3">
         {emergency && emergencyP && (
           <GoalProgressCard
             href="/savings"
@@ -219,7 +243,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Coach (mobile / tablet only — desktop has the right panel) */}
-      <div className="space-y-5 xl:hidden">
+      <div data-tour="ai-coach" className="space-y-5 xl:hidden">
         <CoachHeroCard message={coachMessage(data)} />
         {insights.length > 0 && (
           <div className="space-y-2">
@@ -247,13 +271,27 @@ export default function DashboardPage() {
           </div>
           {recent.length === 0 ? (
             <div className="rounded-3xl bg-grouped px-6 py-8 text-center">
-              <div className="text-3xl">💡</div>
-              <p className="mt-2 text-[15px] font-semibold text-ink">No expenses yet</p>
+              <div className="text-3xl">🎥</div>
+              <p className="mt-2 text-[15px] font-semibold text-ink">New here?</p>
               <p className="mt-1 text-[13px] text-subtle">
-                Try “Grocery 500” — we&apos;ll categorize it automatically.
+                Add your first expense to bring your dashboard to life.
               </p>
-              <Link href="/add" className="btn-primary mt-4">
-                Add expense
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <Link href="/add" className="btn-primary">
+                  ➕ Add expense
+                </Link>
+                <Link
+                  href="/add?receipt=1"
+                  className="rounded-2xl bg-white px-4 py-3 text-[15px] font-semibold text-ink shadow-sm transition active:scale-[0.97]"
+                >
+                  📸 Upload a receipt
+                </Link>
+              </div>
+              <Link
+                href="/learn"
+                className="mt-3 inline-block text-[13px] font-semibold text-brand-600"
+              >
+                🎥 Watch: How to add expenses
               </Link>
             </div>
           ) : (
