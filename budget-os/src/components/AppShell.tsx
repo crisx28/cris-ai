@@ -29,7 +29,7 @@ const TABS = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { name, signOut } = useAuth();
-  const { demoMode, exitDemo, startFresh } = useStore();
+  const { demoMode, exitDemo, startFresh, demoName } = useStore();
   const isActive = (m: string[]) =>
     m.some((x) => (x === "/" ? pathname === "/" : pathname.startsWith(x)));
 
@@ -83,11 +83,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-grouped"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-[13px] font-bold text-white">
-            {(name || "C").charAt(0).toUpperCase()}
+            {(name || "U").charAt(0).toUpperCase()}
           </span>
           <span className="leading-tight">
             <span className="block text-[13px] font-semibold text-ink">
-              {name || "Cris"}
+              {name || "Guest"}
             </span>
             <span className="text-[11px] text-subtle">Sign out</span>
           </span>
@@ -109,7 +109,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {demoMode && (
           <div className="flex flex-wrap items-center justify-between gap-2 bg-brand-600 px-4 py-2.5 text-white lg:px-8">
             <span className="text-[13px] font-medium">
-              ✨ <b>Demo Mode</b> — You are viewing sample financial data.
+              ✨ <b>DEMO MODE</b>
+              {demoName ? ` · ${demoName}` : ""} — You are viewing sample
+              financial data.
             </span>
             <span className="flex gap-2">
               <button

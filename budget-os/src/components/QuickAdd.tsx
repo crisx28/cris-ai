@@ -8,7 +8,7 @@ import { peso } from "@/lib/currency";
 import { useStore } from "@/lib/store";
 
 const EXAMPLES = [
-  "🍔 Jollibee 350",
+  "🍔 Lunch 350",
   "🛒 Grocery 1250",
   "⛽ Gas 1000",
   "📚 School 2600",

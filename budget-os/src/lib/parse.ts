@@ -13,7 +13,7 @@ const HINTS: Array<{ words: string[]; category: ExpenseCategory }> = [
   { words: ["mobile", "globe", "smart", "load", "postpaid", "prepaid", "sim"], category: "Mobile" },
   { words: ["rent", "apartment", "condo", "boarding", "upa"], category: "Rent" },
   { words: ["school", "tuition", "supplies", "book", "uniform", "matricula"], category: "School" },
-  { words: ["school service", "child", "kid", "baby", "diaper", "milk", "gatas", "joaquin", "allowance kid"], category: "Child Expenses" },
+  { words: ["school service", "child", "kid", "baby", "diaper", "milk", "gatas", "allowance kid"], category: "Child Expenses" },
   { words: ["debt", "loan", "credit card", "installment", "utang", "payment card"], category: "Debt Payment" },
   { words: ["medicine", "hospital", "doctor", "mercury", "health", "gamot", "clinic", "dental"], category: "Healthcare" },
   { words: ["netflix", "spotify", "movie", "game", "entertainment", "cinema", "concert"], category: "Entertainment" },

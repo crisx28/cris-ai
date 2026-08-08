@@ -102,7 +102,7 @@ export function CoachPanel() {
             )}
             {tripP && trip && (
               <MiniProgress
-                label={`✈️ ${trip.destination.replace(/[🇨🇳🏝️]/g, "").trim()}`}
+                label={`✈️ ${trip.destination.replace(/[^\w\s,.'-]/g, "").trim()}`}
                 value={tripP.progress}
                 color="#6366f1"
               />

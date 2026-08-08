@@ -16,10 +16,10 @@ export default function SettingsPage() {
       <SectionCard title="Profile" emoji="👤">
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-500 text-lg font-bold text-white">
-            {(name || "C").charAt(0).toUpperCase()}
+            {(name || "U").charAt(0).toUpperCase()}
           </span>
           <div>
-            <p className="text-[15px] font-semibold text-ink">{name || "Cris"}</p>
+            <p className="text-[15px] font-semibold text-ink">{name || "Your profile"}</p>
             <p className="text-[13px] text-subtle">{email || "Demo account (this device)"}</p>
           </div>
         </div>

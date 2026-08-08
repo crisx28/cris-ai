@@ -75,7 +75,7 @@ export default function TravelPage() {
                 <label className="label">Destination</label>
                 <input
                   className="input"
-                  placeholder="e.g. Beijing, China 🇨🇳"
+                  placeholder="e.g. Japan Vacation ✈️"
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                 />

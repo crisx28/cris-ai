@@ -45,7 +45,7 @@ export default function DashboardPage() {
     data.travel.length === 0 &&
     data.fixedExpenses.length === 0;
 
-  const displayName = name || "Cris";
+  const displayName = name || "friend";
   const key = currentMonthKey();
   const income = totalIncome(data.incomes, key);
   const expenses = totalExpenses(data.expenses, key);
@@ -114,7 +114,7 @@ export default function DashboardPage() {
           <p className="text-[14px] text-subtle">
             Want to see what a full dashboard looks like first?
           </p>
-          <button onClick={enterDemo} className="btn-ghost mt-1">
+          <button onClick={() => enterDemo()} className="btn-ghost mt-1">
             ✨ Explore the Demo Account
           </button>
         </div>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
         </Link>
         {!demoMode && (
           <button
-            onClick={enterDemo}
+            onClick={() => enterDemo()}
             className="rounded-full border border-hairline bg-white px-4 py-2 text-[13px] font-semibold text-ink transition hover:border-brand-300 active:scale-95"
           >
             ✨ Explore Sample Data
@@ -262,7 +262,7 @@ export default function DashboardPage() {
           <GoalProgressCard
             href="/travel"
             emoji={goalEmoji(trip.destination)}
-            title={trip.destination.replace(/[🇨🇳🏝️]/g, "").trim()}
+            title={trip.destination.replace(/[^\w\s,.'-]/g, "").trim()}
             current={trip.current}
             target={trip.target}
             color="#6366f1"

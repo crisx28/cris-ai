@@ -13,7 +13,7 @@ interface Msg {
 }
 
 const SUGGESTIONS = [
-  "Can I afford a China trip next year?",
+  "Can I afford a vacation next year?",
   "How much did I spend on food this month?",
   "Which debt should I pay first?",
   "How much can I safely spend today?",

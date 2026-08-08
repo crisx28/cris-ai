@@ -22,12 +22,13 @@ import {
   SavingsGoal,
   TravelFund,
 } from "./types";
-import { generateSeed } from "./seed";
+import { buildDemoAccount, DEMO_ACCOUNTS, generateSeed } from "./seed";
 
 // Storage is split so demo data can NEVER mix with the user's real data.
 const MODE_KEY = "cris-budget-os:mode"; // "user" | "demo"
 const USER_KEY = "cris-budget-os:v1"; // the user's own financial data
 const DEMO_DATA_KEY = "cris-budget-os:demo-data"; // sample data, isolated
+const DEMO_META_KEY = "cris-budget-os:demo-meta"; // which demo account is active
 
 type Mode = "user" | "demo" | null; // null = first launch, choice not made yet
 
@@ -60,8 +61,9 @@ interface StoreContextValue {
   clearAll: () => void;
   mode: Mode;
   demoMode: boolean;
+  demoName: string;
   startFresh: () => void;
-  enterDemo: () => void;
+  enterDemo: (accountId?: string) => void;
   exitDemo: () => void;
 }
 
@@ -80,16 +82,41 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<BudgetData>(EMPTY);
   const [ready, setReady] = useState(false);
   const [mode, setMode] = useState<Mode>(null);
+  const [demoName, setDemoName] = useState("");
 
   // Load on mount (client only). Never auto-seeds into the user's data — the
   // choice screen decides between Start Fresh and Demo.
   useEffect(() => {
+    // Migration: purge any legacy data that contains personal/developer
+    // references (from older builds), so nobody keeps that data.
+    try {
+      const PERSONAL = ["joaquin", "beijing", "bpi", "rcbc", "rodriguez", "unionbank", "deltek"];
+      for (const key of [USER_KEY, DEMO_DATA_KEY]) {
+        const raw = localStorage.getItem(key);
+        if (raw && PERSONAL.some((t) => raw.toLowerCase().includes(t))) {
+          localStorage.removeItem(key);
+          const boundMode = key === DEMO_DATA_KEY ? "demo" : "user";
+          if (localStorage.getItem(MODE_KEY) === boundMode) {
+            localStorage.removeItem(MODE_KEY);
+            localStorage.removeItem(DEMO_META_KEY);
+          }
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+
     try {
       const saved = localStorage.getItem(MODE_KEY) as Mode;
       if (saved === "demo") {
         const raw = localStorage.getItem(DEMO_DATA_KEY);
         const demo = raw ? JSON.parse(raw) : generateSeed();
         if (!raw) localStorage.setItem(DEMO_DATA_KEY, JSON.stringify(demo));
+        try {
+          setDemoName(JSON.parse(localStorage.getItem(DEMO_META_KEY) || "{}").name || DEMO_ACCOUNTS[0].name);
+        } catch {
+          setDemoName(DEMO_ACCOUNTS[0].name);
+        }
         setData(demo);
         setMode("demo");
       } else if (saved === "user") {
@@ -193,6 +220,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       clearAll: () => setData(EMPTY),
       mode,
       demoMode: mode === "demo",
+      demoName,
       // Begin a clean, empty personal profile.
       startFresh: () => {
         try {
@@ -204,18 +232,33 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setData(EMPTY);
         setMode("user");
       },
-      // Explore isolated sample data.
-      enterDemo: () => {
+      // Explore isolated sample data. Pass an accountId to load a specific
+      // demo persona; omit to resume the existing demo (or default).
+      enterDemo: (accountId?: string) => {
         let demo: BudgetData;
+        let name = DEMO_ACCOUNTS[0].name;
         try {
-          const raw = localStorage.getItem(DEMO_DATA_KEY);
-          demo = raw ? JSON.parse(raw) : generateSeed();
+          if (accountId) {
+            const meta = DEMO_ACCOUNTS.find((a) => a.id === accountId) || DEMO_ACCOUNTS[0];
+            demo = buildDemoAccount(meta.id);
+            name = meta.name;
+            localStorage.setItem(DEMO_DATA_KEY, JSON.stringify(demo));
+            localStorage.setItem(DEMO_META_KEY, JSON.stringify({ name }));
+          } else {
+            const raw = localStorage.getItem(DEMO_DATA_KEY);
+            demo = raw ? JSON.parse(raw) : generateSeed();
+            name = JSON.parse(localStorage.getItem(DEMO_META_KEY) || "{}").name || name;
+            if (!raw) {
+              localStorage.setItem(DEMO_DATA_KEY, JSON.stringify(demo));
+              localStorage.setItem(DEMO_META_KEY, JSON.stringify({ name }));
+            }
+          }
           localStorage.setItem(MODE_KEY, "demo");
-          localStorage.setItem(DEMO_DATA_KEY, JSON.stringify(demo));
         } catch {
           demo = generateSeed();
         }
         setData(demo);
+        setDemoName(name);
         setMode("demo");
       },
       // Leave demo and return to the user's own data (kept separate).
@@ -232,7 +275,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setMode("user");
       },
     }),
-    [data, ready, update, mode]
+    [data, ready, update, mode, demoName]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
