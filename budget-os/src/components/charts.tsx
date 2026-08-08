@@ -59,8 +59,8 @@ export function IncomeExpenseChart({
         />
         <Tooltip content={<MoneyTooltip />} cursor={{ fill: "#f1f5f9" }} />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-        <Bar dataKey="income" name="Income" fill="#217048" radius={[6, 6, 0, 0]} />
-        <Bar dataKey="expenses" name="Expenses" fill="#f97316" radius={[6, 6, 0, 0]} />
+        <Bar dataKey="income" name="Income" fill="#6366f1" radius={[6, 6, 0, 0]} />
+        <Bar dataKey="expenses" name="Expenses" fill="#f59e0b" radius={[6, 6, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -164,7 +164,7 @@ export function CategoryCompareBar({
         <Tooltip content={<MoneyTooltip />} cursor={{ fill: "#f1f5f9" }} />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
         <Bar dataKey="lastAmt" name="Last month" fill="#cbd5e1" radius={[0, 6, 6, 0]} />
-        <Bar dataKey="thisAmt" name="This month" fill="#217048" radius={[0, 6, 6, 0]} />
+        <Bar dataKey="thisAmt" name="This month" fill="#6366f1" radius={[0, 6, 6, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -180,8 +180,8 @@ export function SavingsGrowthChart({
       <AreaChart data={data}>
         <defs>
           <linearGradient id="grad-growth" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#34c759" stopOpacity={0.35} />
-            <stop offset="95%" stopColor="#34c759" stopOpacity={0} />
+            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
+            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef2f6" />
@@ -198,7 +198,7 @@ export function SavingsGrowthChart({
           type="monotone"
           dataKey="total"
           name="Cumulative savings"
-          stroke="#217048"
+          stroke="#16a34a"
           strokeWidth={2.5}
           fill="url(#grad-growth)"
         />
@@ -293,7 +293,7 @@ export function SavingsLine({
           type="monotone"
           dataKey="net"
           name="Net savings"
-          stroke="#217048"
+          stroke="#16a34a"
           strokeWidth={2.5}
           dot={{ r: 3 }}
         />

@@ -9,42 +9,40 @@ body {
 }
 
 body {
-  background: #f2f2f7;
-  color: #1c1c1e;
+  background: #f8f8f7;
+  color: #111827;
   font-family: var(--tw-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Display",
-    "Segoe UI", Roboto, system-ui, sans-serif);
+    "Inter", "Segoe UI", Roboto, system-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.011em;
 }
 
-/* iOS-style hidden-until-needed scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #c7c7cc transparent;
+  scrollbar-color: #d1d5db transparent;
 }
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #c7c7cc;
+  background: #d1d5db;
   border-radius: 999px;
 }
 
 @layer components {
-  /* Big rounded iOS card */
   .card {
-    @apply rounded-4xl bg-white shadow-card;
+    @apply rounded-4xl bg-white shadow-card border border-hairline/60;
   }
   .card-pressable {
-    @apply rounded-4xl bg-white shadow-card transition-all duration-200
-      active:scale-[0.98] hover:shadow-float;
+    @apply rounded-4xl bg-white shadow-card border border-hairline/60 transition-all
+      duration-200 hover:shadow-soft hover:-translate-y-[1px];
   }
   .input {
-    @apply w-full rounded-2xl border-0 bg-grouped px-4 py-3 text-[15px]
-      text-ink outline-none ring-1 ring-transparent placeholder:text-subtle
-      focus:bg-white focus:ring-2 focus:ring-brand-400 transition;
+    @apply w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-[15px]
+      text-ink outline-none placeholder:text-subtle
+      focus:border-brand-400 focus:ring-4 focus:ring-brand-100 transition;
   }
   .label {
     @apply block text-[13px] font-medium text-subtle mb-1.5;
@@ -56,15 +54,14 @@ body {
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-1.5 rounded-2xl px-3 py-2
-      text-[15px] font-medium text-ios-blue transition active:scale-[0.97];
+      text-[15px] font-medium text-brand-600 transition active:scale-[0.97];
   }
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px]
       font-medium;
   }
-  /* Section title, iOS grouped-list style */
   .section-title {
-    @apply px-1 text-[13px] font-semibold uppercase tracking-wide text-subtle;
+    @apply px-1 text-[12px] font-semibold uppercase tracking-[0.06em] text-subtle;
   }
 }
 
@@ -79,18 +76,15 @@ body {
   .stagger > *:nth-child(5) { animation-delay: 0.18s; }
   .stagger > *:nth-child(6) { animation-delay: 0.22s; }
 
-  /* Animated progress fill (grows on mount) */
   .bar-fill {
     transform-origin: left center;
     animation: grow-x 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
-
   .safe-bottom {
     padding-bottom: calc(env(safe-area-inset-bottom, 0px));
   }
 }
 
-/* Confetti pieces */
 .confetti-piece {
   position: fixed;
   top: 0;

@@ -9,40 +9,53 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // iOS system palette
-        ink: "#1c1c1e",
-        subtle: "#8e8e93",
-        hairline: "#e5e5ea",
-        grouped: "#f2f2f7",
-        ios: {
-          blue: "#0a84ff",
-          green: "#34c759",
-          mint: "#00c7be",
-          teal: "#30b0c7",
-          indigo: "#5e5ce6",
-          purple: "#af52de",
-          pink: "#ff2d55",
-          red: "#ff3b30",
-          orange: "#ff9500",
-          yellow: "#ffcc00",
-        },
+        // Calm, premium neutrals (Linear / Notion / Apple Health feel)
+        canvas: "#f8f8f7",
+        ink: "#111827",
+        subtle: "#6b7280",
+        hairline: "#e5e7eb",
+        grouped: "#f3f4f6",
+
+        // Semantic
+        success: "#22c55e", // green — ONLY for positive financial health
+        warning: "#f59e0b",
+        danger: "#ef4444",
+
+        // Accent (indigo) — replaces the old dominant green.
+        // `brand` is remapped to indigo so every existing brand-* class
+        // becomes the new accent automatically.
+        accent: "#6366f1",
         brand: {
-          50: "#e9faf0",
-          100: "#c8f2d8",
-          200: "#93e6b4",
-          300: "#5bd98e",
-          400: "#34c759", // iOS green
-          500: "#28a745",
-          600: "#1f8f3a",
-          700: "#1a7331",
-          800: "#165c29",
-          900: "#124a22",
+          50: "#eef2ff",
+          100: "#e0e7ff",
+          200: "#c7d2fe",
+          300: "#a5b4fc",
+          400: "#818cf8",
+          500: "#6366f1",
+          600: "#4f46e5",
+          700: "#4338ca",
+          800: "#3730a3",
+          900: "#312e81",
+        },
+
+        // Semantic tokens kept for category accents & links.
+        ios: {
+          blue: "#6366f1", // links now use the indigo accent
+          green: "#22c55e",
+          mint: "#14b8a6",
+          teal: "#0ea5e9",
+          indigo: "#6366f1",
+          purple: "#8b5cf6",
+          pink: "#ec4899",
+          red: "#ef4444",
+          orange: "#f59e0b",
+          yellow: "#eab308",
         },
       },
       borderRadius: {
         "2xl": "16px",
-        "3xl": "20px",
-        "4xl": "24px",
+        "3xl": "18px",
+        "4xl": "22px",
         "5xl": "28px",
       },
       fontFamily: {
@@ -51,6 +64,7 @@ const config: Config = {
           "BlinkMacSystemFont",
           "SF Pro Display",
           "SF Pro Text",
+          "Inter",
           "Segoe UI",
           "Roboto",
           "system-ui",
@@ -58,9 +72,9 @@ const config: Config = {
         ],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(16,24,40,0.04), 0 8px 24px rgba(16,24,40,0.06)",
-        float: "0 8px 30px rgba(16,24,40,0.12)",
-        press: "inset 0 0 0 1px rgba(0,0,0,0.02)",
+        card: "0 1px 2px rgba(17,24,39,0.04), 0 1px 3px rgba(17,24,39,0.03)",
+        soft: "0 4px 16px rgba(17,24,39,0.05)",
+        float: "0 8px 30px rgba(17,24,39,0.10)",
       },
       keyframes: {
         "fade-up": {
