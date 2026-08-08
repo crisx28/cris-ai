@@ -112,10 +112,9 @@ export function generateInsights(data: BudgetData): Insight[] {
     if (p.recommendedMonthly !== null && p.recommendedMonthly <= surplus) {
       insights.push({
         emoji: "✈️",
-        text: `You're on track for your ${trip.destination.replace(
-          /[🇨🇳🏝️]/g,
-          ""
-        ).trim()} goal. Keep it up!`,
+        text: `You're on track for your ${trip.destination
+          .replace(/[^\w\s,.'-]/g, "")
+          .trim()} goal. Keep it up!`,
         tone: "good",
       });
     }

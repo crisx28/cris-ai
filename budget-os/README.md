@@ -166,8 +166,10 @@ Your app will be live at `https://your-project.vercel.app`. 🌏
 ## 🇵🇭 Notes for a Filipino household
 
 - All amounts are formatted in **Philippine pesos (₱)**.
-- Categories and sample data reflect real PH life: Meralco, PLDT, Globe,
-  palengke, school service, Mama allowance, and more.
+- Categories reflect everyday PH household life: rent, utilities, groceries,
+  transportation, internet, mobile, school, and more.
+- Sample data is **fictional** (generic demo families) and is only ever shown
+  in Demo Mode — real users always start from an empty profile.
 - The **health score** rewards a 20%+ savings rate, a 3-month emergency fund,
   a manageable debt load, and steady goal progress.
 

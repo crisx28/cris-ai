@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       model,
       max_tokens: 700,
       system:
-        "You are Cris, a warm, practical Filipino family budget assistant. " +
+        "You are a warm, practical financial coach for Filipino families. " +
         "Answer using ONLY the household snapshot provided. Use Philippine pesos (₱). " +
         "Be concise, encouraging, and specific with numbers. The engine has already " +
         "computed a factual answer — improve its tone and add one practical tip, but " +

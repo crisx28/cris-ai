@@ -137,17 +137,17 @@ export function goalEmoji(name: string): string {
   if (n.includes("emergency")) return "🛡️";
   if (n.includes("school") || n.includes("educ") || n.includes("tuition")) return "🎓";
   if (n.includes("laptop") || n.includes("phone") || n.includes("gadget")) return "💻";
-  if (n.includes("home") || n.includes("house") || n.includes("bahay")) return "🏡";
+  if (n.includes("home") || n.includes("house") || n.includes("renovation") || n.includes("bahay")) return "🏡";
   if (n.includes("car") || n.includes("kotse")) return "🚗";
   if (n.includes("wedding")) return "💍";
+  if (n.includes("appliance")) return "🧺";
   if (n.includes("baby") || n.includes("child")) return "👶";
   if (
     n.includes("trip") ||
     n.includes("travel") ||
-    n.includes("china") ||
-    n.includes("japan") ||
-    n.includes("boracay") ||
-    n.includes("vacation")
+    n.includes("vacation") ||
+    n.includes("getaway") ||
+    n.includes("flight")
   )
     return "✈️";
   return "🎯";

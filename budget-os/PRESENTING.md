@@ -51,7 +51,7 @@ Have the app open on your phone *before* you start. Then walk through it:
 5. **Open a savings goal and add money past the target.** 🎉 *Let the confetti
    fire.* People smile every time. That smile is the sale.
 6. **Close with:** "I can set this up with *your* real numbers and your own
-   goals — like a China trip, or an emergency fund."
+   goals — like a dream vacation, or an emergency fund."
 
 Keep it short. The confetti and the AI answer are your two "wow" moments.
 

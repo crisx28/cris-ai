@@ -69,7 +69,7 @@ function LoginScreen() {
               <label className="label">👋 What should we call you?</label>
               <input
                 className="input"
-                placeholder="e.g. Cris"
+                placeholder="Your first name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && name.trim() && signInDemo(name)}
@@ -92,7 +92,7 @@ function LoginScreen() {
 
             <button
               className="w-full py-2 text-[14px] font-medium text-subtle"
-              onClick={() => signInDemo("Cris")}
+              onClick={() => signInDemo("")}
             >
               Skip — explore the demo
             </button>

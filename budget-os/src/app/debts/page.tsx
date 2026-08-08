@@ -149,7 +149,7 @@ export default function DebtsPage() {
                 <label className="label">Debt name</label>
                 <input
                   className="input"
-                  placeholder="e.g. BPI Credit Card"
+                  placeholder="e.g. Credit Card"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />

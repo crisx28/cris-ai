@@ -1,13 +1,8 @@
-// Realistic sample data for a working Filipino parent's household.
-// Dates are generated relative to "today" so the dashboard, trends and
-// forecasts always look alive whenever the app is opened.
+// Neutral demo datasets. NO personal or developer-specific data lives here —
+// only generic sample families used strictly for Demo Mode. Real users start
+// from an empty profile (see Start Fresh).
 
-import {
-  BudgetData,
-  Expense,
-  ExpenseCategory,
-  Income,
-} from "./types";
+import { BudgetData, Expense, ExpenseCategory, Income, IncomeSource } from "./types";
 
 let counter = 0;
 const id = (p: string) => `${p}_${Date.now().toString(36)}_${counter++}`;
@@ -15,167 +10,194 @@ const id = (p: string) => `${p}_${Date.now().toString(36)}_${counter++}`;
 function iso(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
-
-// A date `monthsAgo` back, on the given day of month.
 function dayInMonth(monthsAgo: number, day: number): string {
   const now = new Date();
-  const d = new Date(now.getFullYear(), now.getMonth() - monthsAgo, day);
-  return iso(d);
+  return iso(new Date(now.getFullYear(), now.getMonth() - monthsAgo, day));
+}
+const round10 = (n: number) => Math.round(n / 10) * 10;
+
+interface DemoConfig {
+  id: string;
+  name: string;
+  tagline: string;
+  income: number; // total monthly income
+  kids: boolean;
+  incomeSources: { source: string; amount: number; day: number; note: string }[];
+  debts: {
+    name: string;
+    balance: number;
+    interestRate: number;
+    monthlyPayment: number;
+    dueDay: number;
+  }[];
+  goals: { name: string; target: number; current: number; months: number }[];
+  travel: { destination: string; target: number; current: number; months: number }[];
 }
 
-// Monthly recurring expense templates (also mirrored in Fixed Expenses).
-const MONTHLY_EXPENSES: Array<{
-  day: number;
-  description: string;
-  category: ExpenseCategory;
-  amount: number;
-}> = [
-  { day: 5, description: "Apartment rent", category: "Rent", amount: 12000 },
-  { day: 8, description: "Meralco electricity", category: "Utilities", amount: 3800 },
-  { day: 8, description: "Maynilad water", category: "Utilities", amount: 650 },
-  { day: 10, description: "PLDT Home Fibr internet", category: "Internet", amount: 1699 },
-  { day: 12, description: "Globe postpaid plan", category: "Mobile", amount: 999 },
-  { day: 15, description: "School service (Joaquin)", category: "Child Expenses", amount: 2600 },
-  { day: 20, description: "Mama allowance", category: "Miscellaneous", amount: 3000 },
+// Generic everyday spending as a fraction of monthly income — no brand names.
+const EXP: { frac: number; category: ExpenseCategory; desc: string; day: number }[] = [
+  { frac: 0.25, category: "Rent", desc: "Monthly rent", day: 5 },
+  { frac: 0.05, category: "Utilities", desc: "Electricity bill", day: 8 },
+  { frac: 0.012, category: "Utilities", desc: "Water bill", day: 8 },
+  { frac: 0.022, category: "Internet", desc: "Internet bill", day: 10 },
+  { frac: 0.013, category: "Mobile", desc: "Mobile plan", day: 12 },
+  { frac: 0.12, category: "Grocery", desc: "Groceries", day: 3 },
+  { frac: 0.05, category: "Food", desc: "Dining out", day: 9 },
+  { frac: 0.04, category: "Transportation", desc: "Transportation & fuel", day: 11 },
+  { frac: 0.02, category: "Healthcare", desc: "Pharmacy", day: 14 },
+  { frac: 0.015, category: "Entertainment", desc: "Streaming & subscriptions", day: 18 },
+];
+const KIDS_EXP: typeof EXP = [
+  { frac: 0.035, category: "Child Expenses", desc: "School service", day: 15 },
+  { frac: 0.02, category: "School", desc: "School supplies", day: 16 },
 ];
 
-// Variable everyday spending that differs a bit each month.
-const VARIABLE_TEMPLATES: Array<{
-  day: number;
-  description: string;
-  category: ExpenseCategory;
-  base: number;
-}> = [
-  { day: 3, description: "SM Supermarket grocery run", category: "Grocery", base: 4200 },
-  { day: 7, description: "Palengke (wet market)", category: "Grocery", base: 1250 },
-  { day: 9, description: "Jollibee family dinner", category: "Food", base: 890 },
-  { day: 11, description: "Grab to office", category: "Transportation", base: 620 },
-  { day: 14, description: "Mercury Drug medicine", category: "Healthcare", base: 780 },
-  { day: 16, description: "Joaquin school supplies", category: "School", base: 950 },
-  { day: 18, description: "Netflix + Spotify", category: "Entertainment", base: 698 },
-  { day: 21, description: "Puregold grocery", category: "Grocery", base: 3100 },
-  { day: 23, description: "Diesel / gas", category: "Transportation", base: 1500 },
-  { day: 26, description: "Lunch out with kids", category: "Food", base: 1100 },
+const CONFIGS: DemoConfig[] = [
+  {
+    id: "santos",
+    name: "The Santos Family",
+    tagline: "A working family of four",
+    income: 75000,
+    kids: true,
+    incomeSources: [
+      { source: "Salary", amount: 45000, day: 15, note: "Payroll" },
+      { source: "Salary", amount: 22000, day: 30, note: "Payroll" },
+      { source: "Freelance", amount: 8000, day: 22, note: "Side income" },
+    ],
+    debts: [
+      { name: "Credit Card", balance: 25000, interestRate: 3, monthlyPayment: 4000, dueDay: 6 },
+      { name: "Personal Loan", balance: 20000, interestRate: 1.5, monthlyPayment: 3000, dueDay: 6 },
+    ],
+    goals: [
+      { name: "Emergency Fund", target: 150000, current: 25000, months: 14 },
+      { name: "New Appliance", target: 35000, current: 9000, months: 6 },
+    ],
+    travel: [{ destination: "Japan Vacation", target: 180000, current: 38000, months: 8 }],
+  },
+  {
+    id: "reyes",
+    name: "Alex Reyes",
+    tagline: "A solo professional",
+    income: 60000,
+    kids: false,
+    incomeSources: [
+      { source: "Salary", amount: 52000, day: 15, note: "Payroll" },
+      { source: "Freelance", amount: 8000, day: 24, note: "Side project" },
+    ],
+    debts: [
+      { name: "Credit Card", balance: 20000, interestRate: 3, monthlyPayment: 3000, dueDay: 6 },
+    ],
+    goals: [
+      { name: "Emergency Fund", target: 90000, current: 15000, months: 12 },
+      { name: "Laptop Upgrade", target: 80000, current: 22000, months: 6 },
+    ],
+    travel: [],
+  },
+  {
+    id: "cruz",
+    name: "The Cruz Family",
+    tagline: "A dual-income couple",
+    income: 90000,
+    kids: true,
+    incomeSources: [
+      { source: "Salary", amount: 50000, day: 15, note: "Payroll" },
+      { source: "Salary", amount: 40000, day: 30, note: "Payroll" },
+    ],
+    debts: [
+      { name: "Home Loan", balance: 40000, interestRate: 1, monthlyPayment: 5000, dueDay: 6 },
+      { name: "Credit Card", balance: 20000, interestRate: 3, monthlyPayment: 4000, dueDay: 10 },
+    ],
+    goals: [
+      { name: "Emergency Fund", target: 200000, current: 40000, months: 14 },
+      { name: "Home Renovation", target: 300000, current: 60000, months: 18 },
+    ],
+    travel: [],
+  },
 ];
 
-export function generateSeed(): BudgetData {
+// Public metadata for the demo picker.
+export interface DemoMeta {
+  id: string;
+  name: string;
+  tagline: string;
+  income: number;
+}
+export const DEMO_ACCOUNTS: DemoMeta[] = CONFIGS.map((c) => ({
+  id: c.id,
+  name: c.name,
+  tagline: c.tagline,
+  income: c.income,
+}));
+
+export function buildDemoAccount(accountId = "santos"): BudgetData {
   counter = 0;
+  const cfg = CONFIGS.find((c) => c.id === accountId) ?? CONFIGS[0];
   const incomes: Income[] = [];
   const expenses: Expense[] = [];
+  const templates = cfg.kids ? [...EXP, ...KIDS_EXP] : EXP;
 
-  // Build 4 months of history (current month + 3 back) for nice trends.
   for (let m = 0; m <= 3; m++) {
-    const wobble = 1 + (m === 0 ? 0 : (Math.sin(m * 2.1) * 0.06)); // small variation
-
-    // Income: salary paid twice a month + freelance side income.
-    incomes.push({
-      id: id("inc"),
-      date: dayInMonth(m, 15),
-      source: "Salary",
-      amount: 22500,
-      notes: "Mid-month payroll",
-    });
-    incomes.push({
-      id: id("inc"),
-      date: dayInMonth(m, 30),
-      source: "Salary",
-      amount: 22500,
-      notes: "End-month payroll",
-    });
-    incomes.push({
-      id: id("inc"),
-      date: dayInMonth(m, 22),
-      source: "Freelance",
-      amount: Math.round((9000 * wobble) / 100) * 100,
-      notes: "Virtual assistant / automation gig",
-    });
-
-    // Recurring monthly expenses.
-    for (const e of MONTHLY_EXPENSES) {
-      expenses.push({
-        id: id("exp"),
-        date: dayInMonth(m, e.day),
-        description: e.description,
-        category: e.category,
-        amount: e.amount,
+    const wobble = 1 + (m === 0 ? 0 : Math.sin(m * 2.1) * 0.05);
+    for (const s of cfg.incomeSources) {
+      incomes.push({
+        id: id("inc"),
+        date: dayInMonth(m, s.day),
+        source: s.source as IncomeSource,
+        amount: s.source === "Salary" ? s.amount : round10(s.amount * wobble),
+        notes: s.note,
       });
     }
-
-    // Variable everyday spending.
-    for (const t of VARIABLE_TEMPLATES) {
+    for (const t of templates) {
       expenses.push({
         id: id("exp"),
         date: dayInMonth(m, t.day),
-        description: t.description,
+        description: t.desc,
         category: t.category,
-        amount: Math.round((t.base * wobble) / 10) * 10,
+        amount: round10(cfg.income * t.frac * wobble),
       });
     }
-
-    // Debt payments each month.
-    expenses.push({
-      id: id("exp"),
-      date: dayInMonth(m, 6),
-      description: "Credit card payment (BPI)",
-      category: "Debt Payment",
-      amount: 5000,
-    });
-    expenses.push({
-      id: id("exp"),
-      date: dayInMonth(m, 6),
-      description: "Personal loan payment",
-      category: "Debt Payment",
-      amount: 4500,
-    });
+    for (const d of cfg.debts) {
+      expenses.push({
+        id: id("exp"),
+        date: dayInMonth(m, d.dueDay),
+        description: `${d.name} payment`,
+        category: "Debt Payment",
+        amount: d.monthlyPayment,
+      });
+    }
   }
-
-  // A 13th-month-style bonus in the current month to show a good month.
-  incomes.push({
-    id: id("inc"),
-    date: dayInMonth(0, 5),
-    source: "Bonus",
-    amount: 8000,
-    notes: "Performance incentive",
-  });
 
   return {
     incomes,
     expenses,
     fixedExpenses: [
-      { id: id("fix"), name: "Apartment rent", category: "Rent", amount: 12000, dueDay: 5, active: true },
-      { id: id("fix"), name: "Meralco electricity", category: "Utilities", amount: 3800, dueDay: 8, active: true },
-      { id: id("fix"), name: "PLDT internet", category: "Internet", amount: 1699, dueDay: 10, active: true },
-      { id: id("fix"), name: "Globe postpaid", category: "Mobile", amount: 999, dueDay: 12, active: true },
-      { id: id("fix"), name: "School service", category: "Child Expenses", amount: 2600, dueDay: 15, active: true },
-      { id: id("fix"), name: "Mama allowance", category: "Miscellaneous", amount: 3000, dueDay: 20, active: true },
-      { id: id("fix"), name: "Travel fund auto-save", category: "Travel", amount: 2000, dueDay: 25, active: true },
+      { id: id("fix"), name: "Rent", category: "Rent", amount: round10(cfg.income * 0.25), dueDay: 5, active: true },
+      { id: id("fix"), name: "Electricity", category: "Utilities", amount: round10(cfg.income * 0.05), dueDay: 8, active: true },
+      { id: id("fix"), name: "Internet", category: "Internet", amount: round10(cfg.income * 0.022), dueDay: 10, active: true },
+      { id: id("fix"), name: "Mobile plan", category: "Mobile", amount: round10(cfg.income * 0.013), dueDay: 12, active: true },
+      ...(cfg.kids
+        ? [{ id: id("fix"), name: "School service", category: "Child Expenses" as ExpenseCategory, amount: round10(cfg.income * 0.035), dueDay: 15, active: true }]
+        : []),
     ],
-    debts: [
-      { id: id("debt"), name: "BPI Credit Card", balance: 34500, interestRate: 3.5, monthlyPayment: 5000, dueDay: 6 },
-      { id: id("debt"), name: "Personal Loan (SB)", balance: 78000, interestRate: 1.8, monthlyPayment: 4500, dueDay: 6 },
-      { id: id("debt"), name: "Appliance Installment", balance: 14200, interestRate: 0, monthlyPayment: 2400, dueDay: 15 },
-    ],
-    goals: [
-      { id: id("goal"), name: "Emergency Fund", target: 150000, current: 46500, deadline: dayInMonth(-14, 30) },
-      { id: id("goal"), name: "China Trip", target: 120000, current: 38000, deadline: dayInMonth(-4, 20) },
-      { id: id("goal"), name: "Joaquin School Fund", target: 60000, current: 22500, deadline: dayInMonth(-10, 1) },
-      { id: id("goal"), name: "New Laptop", target: 55000, current: 12000, deadline: dayInMonth(-6, 15) },
-    ],
-    travel: [
-      {
-        id: id("trip"),
-        destination: "Beijing, China 🇨🇳",
-        target: 120000,
-        current: 38000,
-        travelDate: dayInMonth(-4, 20),
-      },
-      {
-        id: id("trip"),
-        destination: "Boracay Family Getaway 🏝️",
-        target: 45000,
-        current: 15500,
-        travelDate: dayInMonth(-8, 10),
-      },
-    ],
+    debts: cfg.debts.map((d) => ({ id: id("debt"), ...d })),
+    goals: cfg.goals.map((g) => ({
+      id: id("goal"),
+      name: g.name,
+      target: g.target,
+      current: g.current,
+      deadline: dayInMonth(-g.months, 28),
+    })),
+    travel: cfg.travel.map((t) => ({
+      id: id("trip"),
+      destination: t.destination,
+      target: t.target,
+      current: t.current,
+      travelDate: dayInMonth(-t.months, 20),
+    })),
   };
+}
+
+// Default demo dataset (used by Demo Mode / reset).
+export function generateSeed(): BudgetData {
+  return buildDemoAccount("santos");
 }

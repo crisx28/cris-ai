@@ -48,7 +48,7 @@ function AddInner() {
           Your AI Coach automatically categorizes every transaction — no menus.
         </p>
         <div className="mt-3 space-y-1.5">
-          {["🍔 Jollibee 350", "🛒 Grocery 1200", "📚 School 2600", "💡 Electricity 5800", "⛽ Gas 1000"].map(
+          {["🍔 Lunch 350", "🛒 Grocery 1200", "📚 School 2600", "💡 Electricity 5800", "⛽ Gas 1000"].map(
             (ex) => (
               <div key={ex} className="rounded-2xl bg-grouped px-4 py-2.5 text-[15px] text-ink">
                 {ex}
