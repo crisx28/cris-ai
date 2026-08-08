@@ -36,7 +36,7 @@ function AssistantChat() {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
-      text: "Kumusta! 👋 I'm your Financial Coach. I read your actual numbers, so I can give you real, personal answers — no judgment, just help. Tap a question below to get started.",
+      text: "Kumusta! 👋 Welcome to Cris Budget OS. I'm your Financial Coach — I can help you:\n\n✓ Track spending\n✓ Build savings\n✓ Plan trips\n✓ Reduce debt\n✓ Spend safely each day\n\nWhat would you like to do first? Tap a question below. 👇",
     },
   ]);
   const [input, setInput] = useState("");

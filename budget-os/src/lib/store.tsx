@@ -25,6 +25,8 @@ import {
 import { generateSeed } from "./seed";
 
 const STORAGE_KEY = "cris-budget-os:v1";
+const DEMO_KEY = "cris-budget-os:demo";
+const BACKUP_KEY = "cris-budget-os:backup";
 
 function uid(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random()
@@ -53,6 +55,9 @@ interface StoreContextValue {
   deleteTravel: (id: string) => void;
   resetToSample: () => void;
   clearAll: () => void;
+  demoMode: boolean;
+  enterDemo: () => void;
+  exitDemo: () => void;
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null);
@@ -69,9 +74,15 @@ const EMPTY: BudgetData = {
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<BudgetData>(EMPTY);
   const [ready, setReady] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
 
   // Load on mount (client only).
   useEffect(() => {
+    try {
+      setDemoMode(!!localStorage.getItem(DEMO_KEY));
+    } catch {
+      /* ignore */
+    }
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -165,8 +176,30 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setData(seeded);
       },
       clearAll: () => setData(EMPTY),
+      demoMode,
+      enterDemo: () => {
+        try {
+          if (!demoMode) localStorage.setItem(BACKUP_KEY, JSON.stringify(data));
+          localStorage.setItem(DEMO_KEY, "1");
+        } catch {
+          /* ignore */
+        }
+        setData(generateSeed());
+        setDemoMode(true);
+      },
+      exitDemo: () => {
+        try {
+          const raw = localStorage.getItem(BACKUP_KEY);
+          setData(raw ? JSON.parse(raw) : EMPTY);
+          localStorage.removeItem(BACKUP_KEY);
+          localStorage.removeItem(DEMO_KEY);
+        } catch {
+          setData(EMPTY);
+        }
+        setDemoMode(false);
+      },
     }),
-    [data, ready, update]
+    [data, ready, update, demoMode]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

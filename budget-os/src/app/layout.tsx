@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth";
 import { AuthGate } from "@/components/AuthGate";
 import { AppShell } from "@/components/AppShell";
 import { ServiceWorker } from "@/components/ServiceWorker";
+import { TourProvider } from "@/components/tour/TourProvider";
 
 export const metadata: Metadata = {
   applicationName: "Cris Budget OS",
@@ -45,7 +46,9 @@ export default function RootLayout({
         <AuthProvider>
           <StoreProvider>
             <AuthGate>
-              <AppShell>{children}</AppShell>
+              <TourProvider>
+                <AppShell>{children}</AppShell>
+              </TourProvider>
             </AuthGate>
           </StoreProvider>
         </AuthProvider>

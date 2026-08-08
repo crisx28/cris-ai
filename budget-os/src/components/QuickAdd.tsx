@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, Mic } from "lucide-react";
 import { parseQuickAdd, ParsedExpense } from "@/lib/parse";
 import { CATEGORY_META } from "@/lib/types";
 import { peso } from "@/lib/currency";
@@ -20,11 +20,33 @@ export function QuickAdd() {
   const [text, setText] = useState("");
   const [preview, setPreview] = useState<ParsedExpense | null>(null);
   const [saved, setSaved] = useState(false);
+  const [voiceOK, setVoiceOK] = useState(false);
+  const [listening, setListening] = useState(false);
+
+  useEffect(() => {
+    const w = window as any;
+    setVoiceOK(!!(w.SpeechRecognition || w.webkitSpeechRecognition));
+  }, []);
 
   function onChange(v: string) {
     setText(v);
     setSaved(false);
     setPreview(parseQuickAdd(v));
+  }
+
+  function startVoice() {
+    const w = window as any;
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) return;
+    const rec = new SR();
+    rec.lang = "en-PH";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e: any) => onChange(e.results[0][0].transcript);
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    setListening(true);
+    rec.start();
   }
 
   function save() {
@@ -69,10 +91,25 @@ export function QuickAdd() {
           value={text}
           onChange={(e) => onChange(e.target.value)}
         />
+        {voiceOK && (
+          <button
+            type="button"
+            onClick={startVoice}
+            aria-label="Voice input"
+            className={`flex shrink-0 items-center justify-center rounded-2xl border border-hairline px-3 transition active:scale-95 ${
+              listening ? "bg-brand-500 text-white" : "bg-white text-brand-600"
+            }`}
+          >
+            <Mic size={18} />
+          </button>
+        )}
         <button type="submit" className="btn-primary shrink-0" disabled={!preview}>
           Add
         </button>
       </form>
+      {listening && (
+        <p className="mt-2 text-[12px] text-brand-600">🎙️ Listening… say “Grocery 1250”.</p>
+      )}
 
       {preview && (
         <div className="mt-3 flex animate-pop-in items-center justify-between rounded-2xl bg-grouped px-4 py-3 text-[15px]">
