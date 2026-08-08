@@ -60,10 +60,10 @@ export default function AnalyticsPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <SectionCard title="Spending Trend">
-          <TrendArea data={series} dataKey="expenses" name="Expenses" color="#f97316" />
+          <TrendArea data={series} dataKey="expenses" name="Expenses" color="#f59e0b" />
         </SectionCard>
         <SectionCard title="Income Trend">
-          <TrendArea data={series} dataKey="income" name="Income" color="#217048" />
+          <TrendArea data={series} dataKey="income" name="Income" color="#6366f1" />
         </SectionCard>
       </div>
 

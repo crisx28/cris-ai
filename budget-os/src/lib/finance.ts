@@ -365,9 +365,19 @@ export function dailySafeSpend(data: BudgetData, ref = new Date()): SafeSpend {
   const available = remainingCash(data, key);
   const days = Math.max(1, daysUntilPayday(DEFAULT_PAYDAYS, ref));
   const today = ref.getDate();
-  // Bills still due before the next paycheck arrives.
+  // Bills still due before the next paycheck arrives — but skip any that have
+  // already been paid this month (a matching expense in the same category and
+  // amount), so we don't double-count against available cash.
+  const paidThisMonth = inMonth(data.expenses, key);
   const upcomingBills = data.fixedExpenses
-    .filter((f) => f.active && f.dueDay >= today)
+    .filter(
+      (f) =>
+        f.active &&
+        f.dueDay >= today &&
+        !paidThisMonth.some(
+          (e) => e.category === f.category && Math.abs(e.amount - f.amount) < 1
+        )
+    )
     .reduce((t, f) => t + f.amount, 0);
   const spendable = Math.max(0, available - upcomingBills);
   const perDay = Math.floor(spendable / days);

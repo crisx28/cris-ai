@@ -42,11 +42,11 @@ export function StatCard({
 }) {
   const toneClass =
     tone === "positive"
-      ? "text-brand-500"
+      ? "text-success"
       : tone === "negative"
-      ? "text-ios-red"
+      ? "text-danger"
       : tone === "brand"
-      ? "text-ios-blue"
+      ? "text-brand-600"
       : "text-ink";
   return (
     <div className="card p-4">

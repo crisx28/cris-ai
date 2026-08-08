@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { Suspense, useRef, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Send, Bot, User, Sparkles } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { answerQuestion } from "@/lib/assistant";
@@ -21,7 +22,17 @@ const SUGGESTIONS = [
 ];
 
 export default function AssistantPage() {
+  return (
+    <Suspense fallback={null}>
+      <AssistantChat />
+    </Suspense>
+  );
+}
+
+function AssistantChat() {
   const { data, ready } = useStore();
+  const searchParams = useSearchParams();
+  const askedFromUrl = useRef(false);
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
@@ -36,6 +47,16 @@ export default function AssistantPage() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, thinking]);
+
+  // Auto-ask a question passed from the Coach panel (e.g. /assistant?q=...).
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && ready && !askedFromUrl.current) {
+      askedFromUrl.current = true;
+      ask(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, searchParams]);
 
   // Phase 9: one tap populates the input so the user can edit before sending.
   function suggest(prompt: string) {
@@ -91,8 +112,8 @@ export default function AssistantPage() {
               <div
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                   m.role === "user"
-                    ? "bg-slate-200 text-slate-600"
-                    : "bg-brand-600 text-white"
+                    ? "bg-grouped text-subtle"
+                    : "bg-brand-500 text-white"
                 }`}
               >
                 {m.role === "user" ? <User size={16} /> : <Bot size={16} />}
@@ -100,8 +121,8 @@ export default function AssistantPage() {
               <div
                 className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${
                   m.role === "user"
-                    ? "bg-brand-600 text-white"
-                    : "bg-slate-100 text-slate-800"
+                    ? "bg-brand-500 text-white"
+                    : "bg-grouped text-ink"
                 }`}
               >
                 {m.text}
@@ -110,10 +131,10 @@ export default function AssistantPage() {
           ))}
           {thinking && (
             <div className="flex gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-white">
                 <Bot size={16} />
               </div>
-              <div className="rounded-2xl bg-slate-100 px-4 py-3">
+              <div className="rounded-2xl bg-grouped px-4 py-3">
                 <div className="flex gap-1">
                   <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.3s]" />
                   <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.15s]" />
