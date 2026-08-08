@@ -1,0 +1,15 @@
+# Render Blueprint — deploys the Next.js budget app in budget-os/.
+# In Render: New + → Blueprint → connect this repo → Apply.
+services:
+  - type: web
+    name: cris-budget-os
+    runtime: node
+    rootDir: budget-os
+    plan: free
+    branch: main
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20.16.0"
