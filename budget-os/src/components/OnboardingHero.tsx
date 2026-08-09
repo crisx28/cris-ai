@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Play, X, Check } from "lucide-react";
 import { useTour } from "@/components/tour/TourProvider";
 import { VideoModal } from "@/components/VideoModal";
+import { useWorkspace } from "@/lib/workspace";
 import { DEMO_VIDEO, DEMO_FEATURES } from "@/lib/media";
 
 const HERO_KEY = "cris-onboarding:hero";
@@ -12,6 +13,7 @@ const WATCHED_KEY = "cris-onboarding:video";
 // Prominent onboarding hero: 60-second demo + product tour. Dismissible.
 export function OnboardingHero() {
   const { startTour } = useTour();
+  const { name: appName } = useWorkspace();
   const [dismissed, setDismissed] = useState(true);
   const [videoOpen, setVideoOpen] = useState(false);
 
@@ -53,7 +55,7 @@ export function OnboardingHero() {
               </button>
             </div>
             <h2 className="mt-1 text-[22px] font-bold tracking-tight text-ink">
-              See how Cris Budget OS helps you
+              See how {appName} helps you
             </h2>
             <ul className="mt-3 space-y-1.5">
               {DEMO_FEATURES.map((f) => (
@@ -106,7 +108,7 @@ export function OnboardingHero() {
       <VideoModal
         open={videoOpen}
         onClose={() => setVideoOpen(false)}
-        title="Cris Budget OS — 60-second demo"
+        title={`${appName} — 60-second demo`}
         video={DEMO_VIDEO}
         onWatched={() => {
           try {

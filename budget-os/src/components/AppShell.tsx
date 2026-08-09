@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useStore } from "@/lib/store";
+import { useWorkspace } from "@/lib/workspace";
 import { CoachPanel } from "@/components/CoachPanel";
 
 // Desktop left-sidebar navigation.
@@ -12,6 +13,7 @@ const NAV = [
   { href: "/expenses", label: "Expenses", emoji: "💸", match: ["/expenses", "/income", "/fixed"], tour: "nav-expenses" },
   { href: "/savings", label: "Goals", emoji: "🎯", match: ["/savings", "/travel", "/debts"], tour: "" },
   { href: "/reports", label: "Reports", emoji: "📊", match: ["/reports", "/analytics"], tour: "nav-reports" },
+  { href: "/calendar", label: "Calendar", emoji: "📅", match: ["/calendar"], tour: "" },
   { href: "/assistant", label: "AI Coach", emoji: "🤖", match: ["/assistant"], tour: "" },
   { href: "/learn", label: "Learn", emoji: "❓", match: ["/learn"], tour: "" },
   { href: "/settings", label: "Settings", emoji: "⚙️", match: ["/settings"], tour: "" },
@@ -30,6 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { name, signOut } = useAuth();
   const { demoMode, exitDemo, startFresh, demoName } = useStore();
+  const { name: appName } = useWorkspace();
   const isActive = (m: string[]) =>
     m.some((x) => (x === "/" ? pathname === "/" : pathname.startsWith(x)));
 
@@ -46,7 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="leading-tight">
             <div className="flex items-center gap-1.5">
-              <span className="text-[15px] font-bold text-ink">Cris Budget OS</span>
+              <span className="text-[15px] font-bold text-ink">{appName}</span>
               {demoMode && (
                 <span className="rounded-md bg-brand-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-brand-700">
                   DEMO

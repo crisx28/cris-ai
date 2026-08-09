@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { peso, pct } from "@/lib/currency";
 import { goalProjection } from "@/lib/finance";
 import { goalEmoji } from "@/lib/types";
+import { useMotion } from "@/lib/motion";
 import { PageHeader, StatCard, SectionCard, EmptyState, ProgressBar } from "@/components/ui";
 import { Confetti } from "@/components/Confetti";
 
@@ -36,6 +37,20 @@ export default function SavingsPage() {
   const goals = ready ? data.goals : [];
   const totalSaved = goals.reduce((t, g) => t + g.current, 0);
   const totalTarget = goals.reduce((t, g) => t + g.target, 0);
+
+  const { createTask } = useMotion();
+  const [planned, setPlanned] = useState<Record<string, boolean>>({});
+
+  async function makePlan(goalId: string, goalName: string, monthly: number) {
+    await createTask({
+      title: `Save ${peso(monthly)} for ${goalName}`,
+      kind: "savings",
+      amount: monthly,
+      recurrence: "monthly",
+      source: "goal",
+    });
+    setPlanned((p) => ({ ...p, [goalId]: true }));
+  }
 
   function contribute(id: string, currentAmt: number, targetAmt: number) {
     const input = prompt("How much to add to this goal? (₱)");
@@ -179,6 +194,16 @@ export default function SavingsPage() {
                     >
                       <Plus size={15} /> Add money
                     </button>
+                    {p.requiredMonthly ? (
+                      <button
+                        onClick={() => makePlan(g.id, g.name, p.requiredMonthly!)}
+                        className="mt-2 w-full rounded-2xl border border-hairline py-2.5 text-[14px] font-semibold text-ink transition active:scale-[0.98]"
+                      >
+                        {planned[g.id]
+                          ? "✓ Action plan created"
+                          : `📤 Create Action Plan · ${peso(p.requiredMonthly)}/mo`}
+                      </button>
+                    ) : null}
                   </div>
                 );
               })}

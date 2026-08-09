@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useStore } from "@/lib/store";
+import { useWorkspace } from "@/lib/workspace";
 import { ModeChoice } from "@/components/ModeChoice";
 
 // Gates the app: sign in → choose Start Fresh / Demo → app.
@@ -25,6 +26,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
 function LoginScreen() {
   const { signInDemo, signInWithEmail, supabaseEnabled } = useAuth();
+  const { name: appName } = useWorkspace();
   const [mode, setMode] = useState<"welcome" | "email">("welcome");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -56,7 +58,7 @@ function LoginScreen() {
             ₱
           </div>
           <h1 className="text-[26px] font-bold tracking-tight text-ink">
-            Cris Budget OS
+            {appName}
           </h1>
           <p className="mt-1 text-[15px] text-subtle">
             Your family money, in control. 💚

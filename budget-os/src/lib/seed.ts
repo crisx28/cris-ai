@@ -194,6 +194,7 @@ export function buildDemoAccount(accountId = "santos"): BudgetData {
       current: t.current,
       travelDate: dayInMonth(-t.months, 20),
     })),
+    tasks: [],
   };
 }
 
