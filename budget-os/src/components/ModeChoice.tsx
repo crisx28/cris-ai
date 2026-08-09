@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useWorkspace } from "@/lib/workspace";
 import { DEMO_ACCOUNTS } from "@/lib/seed";
 import { peso } from "@/lib/currency";
 
 // First-launch screen: Start Fresh (own profile) or Explore a demo persona.
 export function ModeChoice() {
   const { startFresh, enterDemo } = useStore();
+  const { name: appName } = useWorkspace();
   const [step, setStep] = useState<"root" | "demo">("root");
 
   return (
@@ -19,7 +21,7 @@ export function ModeChoice() {
             ₱
           </div>
           <h1 className="text-[24px] font-bold tracking-tight text-ink">
-            Welcome to Cris Budget OS
+            Welcome to {appName}
           </h1>
           <p className="mt-1 text-[15px] text-subtle">
             {step === "root"

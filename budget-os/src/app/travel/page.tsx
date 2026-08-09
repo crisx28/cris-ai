@@ -5,6 +5,7 @@ import { Trash2, Plus, Plane } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { peso, pct } from "@/lib/currency";
 import { travelProjection } from "@/lib/finance";
+import { useMotion } from "@/lib/motion";
 import { PageHeader, StatCard, SectionCard, EmptyState, ProgressBar } from "@/components/ui";
 import { Confetti } from "@/components/Confetti";
 
@@ -30,6 +31,21 @@ export default function TravelPage() {
     setTarget("");
     setCurrent("");
     setTravelDate("");
+  }
+
+  const { createTask } = useMotion();
+  const [planned, setPlanned] = useState<Record<string, boolean>>({});
+
+  async function makePlan(fundId: string, destination: string, monthly: number) {
+    const name = destination.replace(/[^\w\s,.'-]/g, "").trim();
+    await createTask({
+      title: `Set aside ${peso(monthly)} for ${name}`,
+      kind: "travel",
+      amount: monthly,
+      recurrence: "monthly",
+      source: "goal",
+    });
+    setPlanned((p) => ({ ...p, [fundId]: true }));
   }
 
   function contribute(id: string, currentAmt: number, targetAmt: number) {
@@ -191,6 +207,16 @@ export default function TravelPage() {
                       >
                         <Plus size={15} /> Add to fund
                       </button>
+                      {p.recommendedMonthly ? (
+                        <button
+                          onClick={() => makePlan(f.id, f.destination, p.recommendedMonthly!)}
+                          className="mt-2 w-full rounded-2xl border border-hairline py-2.5 text-[14px] font-semibold text-ink transition active:scale-[0.98]"
+                        >
+                          {planned[f.id]
+                            ? "✓ Action plan created"
+                            : `📤 Send Plan to Motion · ${peso(p.recommendedMonthly)}/mo`}
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 );

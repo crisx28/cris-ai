@@ -101,6 +101,29 @@ export interface TravelFund {
   travelDate?: string; // ISO yyyy-mm-dd
 }
 
+export type TaskKind =
+  | "debt"
+  | "savings"
+  | "travel"
+  | "bill"
+  | "review"
+  | "other";
+
+export type Recurrence = "none" | "weekly" | "monthly" | "payday";
+
+export interface FinancialTask {
+  id: string;
+  title: string;
+  kind: TaskKind;
+  amount?: number;
+  dueDate?: string; // ISO yyyy-mm-dd
+  recurrence: Recurrence;
+  status: "pending" | "done";
+  source: "ai" | "routine" | "goal" | "manual";
+  motionId?: string; // set when synced to usemotion.com
+  createdAt: string;
+}
+
 export interface BudgetData {
   incomes: Income[];
   expenses: Expense[];
@@ -108,6 +131,7 @@ export interface BudgetData {
   debts: Debt[];
   goals: SavingsGoal[];
   travel: TravelFund[];
+  tasks: FinancialTask[];
 }
 
 // Category → emoji + tailwind color, used everywhere for consistency.

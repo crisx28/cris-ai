@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import { AuthProvider } from "@/lib/auth";
+import { WorkspaceProvider } from "@/lib/workspace";
 import { AuthGate } from "@/components/AuthGate";
 import { AppShell } from "@/components/AppShell";
 import { ServiceWorker } from "@/components/ServiceWorker";
@@ -43,15 +44,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          <StoreProvider>
-            <AuthGate>
-              <TourProvider>
-                <AppShell>{children}</AppShell>
-              </TourProvider>
-            </AuthGate>
-          </StoreProvider>
-        </AuthProvider>
+        <WorkspaceProvider>
+          <AuthProvider>
+            <StoreProvider>
+              <AuthGate>
+                <TourProvider>
+                  <AppShell>{children}</AppShell>
+                </TourProvider>
+              </AuthGate>
+            </StoreProvider>
+          </AuthProvider>
+        </WorkspaceProvider>
         <ServiceWorker />
       </body>
     </html>

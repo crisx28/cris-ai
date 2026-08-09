@@ -16,6 +16,7 @@ import {
   totalIncome,
 } from "./finance";
 import { reviewInsights } from "./insights";
+import { getWorkspaceName } from "./workspace";
 import { BudgetData } from "./types";
 
 function triggerDownload(blob: Blob, filename: string) {
@@ -62,7 +63,7 @@ export function exportCSV(data: BudgetData) {
   const row = (cells: (string | number)[]) => cells.map(esc).join(",");
   const lines: string[] = [];
 
-  lines.push(`Cris Budget OS — Monthly Financial Review`);
+  lines.push(`${getWorkspaceName()} — Monthly Financial Review`);
   lines.push(`Period,${r.period}`);
   lines.push(`Generated,${new Date().toLocaleDateString("en-PH")}`);
   lines.push("");
@@ -108,7 +109,7 @@ export async function exportXLSX(data: BudgetData) {
   const r = buildReview(data);
   const ExcelJS = (await import("exceljs")).default;
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Cris Budget OS";
+  wb.creator = getWorkspaceName();
   wb.created = new Date();
 
   const green = "FF217048";
@@ -182,7 +183,7 @@ export async function exportPDF(data: BudgetData) {
 
   doc.setFontSize(18);
   doc.setTextColor("#217048");
-  doc.text("Cris Budget OS — Monthly Financial Review", 14, 20);
+  doc.text(`${getWorkspaceName()} — Monthly Financial Review`, 14, 20);
   doc.setFontSize(11);
   doc.setTextColor("#475569");
   doc.text(`Period: ${r.period}`, 14, 28);

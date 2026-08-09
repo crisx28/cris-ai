@@ -1,17 +1,60 @@
 "use client";
 
+import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
+import { useWorkspace, DEFAULT_NAME } from "@/lib/workspace";
 import { PageHeader, SectionCard } from "@/components/ui";
 import { DEFAULT_PAYDAYS } from "@/lib/finance";
+
+const NAME_IDEAS = ["My Family Budget", "Money Coach", "Financial HQ", "Budget Buddy", "Life Planner"];
 
 export default function SettingsPage() {
   const { resetToSample, clearAll } = useStore();
   const { name, email, signOut, supabaseEnabled } = useAuth();
+  const { name: appName, setName: setAppName } = useWorkspace();
+  const [draft, setDraft] = useState(appName);
+  const [saved, setSaved] = useState(false);
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Settings" emoji="⚙️" subtitle="Manage your account and data." />
+      <PageHeader title="Settings" emoji="⚙️" subtitle="Manage your workspace, account and data." />
+
+      <SectionCard title="Workspace" emoji="🏷️">
+        <label className="label">App name (shown throughout the app)</label>
+        <input
+          className="input"
+          value={draft}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            setSaved(false);
+          }}
+          placeholder={DEFAULT_NAME}
+        />
+        <div className="mt-2 flex flex-wrap gap-2">
+          {NAME_IDEAS.map((idea) => (
+            <button
+              key={idea}
+              onClick={() => {
+                setDraft(idea);
+                setSaved(false);
+              }}
+              className="chip bg-grouped text-subtle transition active:scale-95"
+            >
+              {idea}
+            </button>
+          ))}
+        </div>
+        <button
+          className="btn-primary mt-3 w-full"
+          onClick={() => {
+            setAppName(draft);
+            setSaved(true);
+          }}
+        >
+          {saved ? "Saved ✓" : "Save name"}
+        </button>
+      </SectionCard>
 
       <SectionCard title="Profile" emoji="👤">
         <div className="flex items-center gap-3">
@@ -73,7 +116,7 @@ export default function SettingsPage() {
 
       <SectionCard title="About" emoji="💚">
         <p className="text-[14px] leading-relaxed text-subtle">
-          <b className="text-ink">Cris Budget OS</b> — an AI Financial Coach for
+          <b className="text-ink">{appName}</b> — an AI Financial Coach for
           working parents. Built with care to help families feel guided,
           encouraged, and in control of their money.
         </p>

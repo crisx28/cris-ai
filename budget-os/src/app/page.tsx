@@ -24,6 +24,7 @@ import { peso, pct } from "@/lib/currency";
 import { CATEGORY_META, goalEmoji } from "@/lib/types";
 import { StatCard, ProgressBar } from "@/components/ui";
 import { GoalProgressCard } from "@/components/GoalProgressCard";
+import { ActionCenter } from "@/components/ActionCenter";
 import { CoachHeroCard } from "@/components/CoachHeroCard";
 import { OnboardingHero } from "@/components/OnboardingHero";
 import { QuickStart } from "@/components/QuickStart";
@@ -230,6 +231,9 @@ export default function DashboardPage() {
           <p className="text-[18px] font-bold text-ink">{safe.days} days</p>
         </div>
       </div>
+
+      {/* AI Action Center — insight → execution */}
+      <ActionCenter />
 
       {/* Middle row — goals + health */}
       <div data-tour="goals" className="grid gap-4 lg:grid-cols-3">

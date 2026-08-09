@@ -17,6 +17,7 @@ import {
   BudgetData,
   Debt,
   Expense,
+  FinancialTask,
   FixedExpense,
   Income,
   SavingsGoal,
@@ -57,6 +58,9 @@ interface StoreContextValue {
   addTravel: (t: Omit<TravelFund, "id">) => void;
   updateTravel: (id: string, patch: Partial<TravelFund>) => void;
   deleteTravel: (id: string) => void;
+  addTask: (t: Omit<FinancialTask, "id" | "createdAt" | "status">) => void;
+  toggleTask: (id: string) => void;
+  deleteTask: (id: string) => void;
   resetToSample: () => void;
   clearAll: () => void;
   mode: Mode;
@@ -76,7 +80,13 @@ const EMPTY: BudgetData = {
   debts: [],
   goals: [],
   travel: [],
+  tasks: [],
 };
+
+// Older saved data may predate the tasks field — normalize on load.
+function normalize(d: Partial<BudgetData> | null): BudgetData {
+  return { ...EMPTY, ...(d || {}), tasks: (d as any)?.tasks ?? [] };
+}
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<BudgetData>(EMPTY);
@@ -110,7 +120,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const saved = localStorage.getItem(MODE_KEY) as Mode;
       if (saved === "demo") {
         const raw = localStorage.getItem(DEMO_DATA_KEY);
-        const demo = raw ? JSON.parse(raw) : generateSeed();
+        const demo = raw ? normalize(JSON.parse(raw)) : generateSeed();
         if (!raw) localStorage.setItem(DEMO_DATA_KEY, JSON.stringify(demo));
         try {
           setDemoName(JSON.parse(localStorage.getItem(DEMO_META_KEY) || "{}").name || DEMO_ACCOUNTS[0].name);
@@ -121,14 +131,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setMode("demo");
       } else if (saved === "user") {
         const raw = localStorage.getItem(USER_KEY);
-        setData(raw ? JSON.parse(raw) : EMPTY);
+        setData(raw ? normalize(JSON.parse(raw)) : EMPTY);
         setMode("user");
       } else {
         // Migration: existing installs already have data under USER_KEY and no
         // mode flag — keep it as their own data so they skip the choice.
         const legacy = localStorage.getItem(USER_KEY);
         if (legacy) {
-          setData(JSON.parse(legacy));
+          setData(normalize(JSON.parse(legacy)));
           setMode("user");
           localStorage.setItem(MODE_KEY, "user");
         } else {
@@ -216,6 +226,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         })),
       deleteTravel: (id) =>
         update((d) => ({ ...d, travel: d.travel.filter((x) => x.id !== id) })),
+      addTask: (t) =>
+        update((d) => ({
+          ...d,
+          tasks: [
+            { ...t, id: uid("task"), status: "pending", createdAt: new Date().toISOString() },
+            ...(d.tasks ?? []),
+          ],
+        })),
+      toggleTask: (id) =>
+        update((d) => ({
+          ...d,
+          tasks: (d.tasks ?? []).map((x) =>
+            x.id === id ? { ...x, status: x.status === "done" ? "pending" : "done" } : x
+          ),
+        })),
+      deleteTask: (id) =>
+        update((d) => ({ ...d, tasks: (d.tasks ?? []).filter((x) => x.id !== id) })),
       resetToSample: () => setData(generateSeed()),
       clearAll: () => setData(EMPTY),
       mode,
@@ -246,7 +273,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(DEMO_META_KEY, JSON.stringify({ name }));
           } else {
             const raw = localStorage.getItem(DEMO_DATA_KEY);
-            demo = raw ? JSON.parse(raw) : generateSeed();
+            demo = raw ? normalize(JSON.parse(raw)) : generateSeed();
             name = JSON.parse(localStorage.getItem(DEMO_META_KEY) || "{}").name || name;
             if (!raw) {
               localStorage.setItem(DEMO_DATA_KEY, JSON.stringify(demo));
@@ -266,7 +293,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         let own: BudgetData = EMPTY;
         try {
           const raw = localStorage.getItem(USER_KEY);
-          own = raw ? JSON.parse(raw) : EMPTY;
+          own = raw ? normalize(JSON.parse(raw)) : EMPTY;
           localStorage.setItem(MODE_KEY, "user");
         } catch {
           own = EMPTY;
