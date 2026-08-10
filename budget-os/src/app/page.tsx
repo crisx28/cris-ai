@@ -25,6 +25,7 @@ import { CATEGORY_META, goalEmoji } from "@/lib/types";
 import { StatCard, ProgressBar } from "@/components/ui";
 import { GoalProgressCard } from "@/components/GoalProgressCard";
 import { ActionCenter } from "@/components/ActionCenter";
+import { MonthlyFixedCard } from "@/components/MonthlyFixedCard";
 import { CoachHeroCard } from "@/components/CoachHeroCard";
 import { OnboardingHero } from "@/components/OnboardingHero";
 import { QuickStart } from "@/components/QuickStart";
@@ -304,6 +305,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Monthly fixed expenses summary */}
+      <MonthlyFixedCard />
 
       {/* Coach (mobile / tablet only — desktop has the right panel) */}
       <div data-tour="ai-coach" className="space-y-5 xl:hidden">

@@ -83,9 +83,14 @@ const EMPTY: BudgetData = {
   tasks: [],
 };
 
-// Older saved data may predate the tasks field — normalize on load.
+// Older saved data may predate newer fields — normalize on load.
 function normalize(d: Partial<BudgetData> | null): BudgetData {
-  return { ...EMPTY, ...(d || {}), tasks: (d as any)?.tasks ?? [] };
+  const base = { ...EMPTY, ...(d || {}), tasks: (d as any)?.tasks ?? [] };
+  base.fixedExpenses = (base.fixedExpenses ?? []).map((f) => ({
+    ...f,
+    frequency: f.frequency ?? "monthly",
+  }));
+  return base;
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {

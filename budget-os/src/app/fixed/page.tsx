@@ -7,9 +7,20 @@ import {
   CATEGORY_META,
   EXPENSE_CATEGORIES,
   ExpenseCategory,
+  FREQUENCIES,
+  Frequency,
 } from "@/lib/types";
 import { peso } from "@/lib/currency";
+import { monthlyEquivalent } from "@/lib/calendar";
 import { PageHeader, StatCard, SectionCard, EmptyState } from "@/components/ui";
+
+const FREQ_LABEL: Record<Frequency, string> = {
+  weekly: "Weekly",
+  biweekly: "Biweekly",
+  monthly: "Monthly",
+  quarterly: "Quarterly",
+  yearly: "Yearly",
+};
 
 export default function FixedExpensesPage() {
   const { data, ready, addFixedExpense, toggleFixedExpense, deleteFixedExpense } =
@@ -18,17 +29,22 @@ export default function FixedExpensesPage() {
   const [category, setCategory] = useState<ExpenseCategory>("Utilities");
   const [amount, setAmount] = useState("");
   const [dueDay, setDueDay] = useState("1");
+  const [frequency, setFrequency] = useState<Frequency>("monthly");
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const amt = parseFloat(amount);
-    const day = parseInt(dueDay, 10);
+    const day = Math.min(31, Math.max(1, parseInt(dueDay, 10) || 1));
     if (!amt || amt <= 0 || !name.trim()) return;
+    const now = new Date();
+    const anchorDay = Math.min(day, new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate());
     addFixedExpense({
       name: name.trim(),
       category,
       amount: amt,
-      dueDay: Math.min(31, Math.max(1, day || 1)),
+      dueDay: day,
+      frequency,
+      anchorDate: new Date(now.getFullYear(), now.getMonth(), anchorDay).toISOString().slice(0, 10),
       active: true,
     });
     setName("");
@@ -40,7 +56,7 @@ export default function FixedExpensesPage() {
     : [];
   const activeTotal = list
     .filter((f) => f.active)
-    .reduce((t, f) => t + f.amount, 0);
+    .reduce((t, f) => t + monthlyEquivalent(f.amount, f.frequency ?? "monthly"), 0);
 
   const today = new Date().getDate();
   const upcoming = list
@@ -61,7 +77,7 @@ export default function FixedExpensesPage() {
           label="Expected / month"
           value={peso(activeTotal)}
           tone="negative"
-          hint="Sum of active fixed bills"
+          hint="Monthly-equivalent of all bills"
         />
         <StatCard label="Active bills" value={String(list.filter((f) => f.active).length)} />
         <StatCard label="Total defined" value={String(list.length)} />
@@ -131,7 +147,7 @@ export default function FixedExpensesPage() {
                   />
                 </div>
                 <div>
-                  <label className="label">Due day</label>
+                  <label className="label">Day of month</label>
                   <input
                     className="input"
                     type="number"
@@ -141,6 +157,20 @@ export default function FixedExpensesPage() {
                     onChange={(e) => setDueDay(e.target.value)}
                   />
                 </div>
+              </div>
+              <div>
+                <label className="label">Frequency</label>
+                <select
+                  className="input"
+                  value={frequency}
+                  onChange={(e) => setFrequency(e.target.value as Frequency)}
+                >
+                  {FREQUENCIES.map((f) => (
+                    <option key={f} value={f}>
+                      {FREQ_LABEL[f]}
+                    </option>
+                  ))}
+                </select>
               </div>
               <button className="btn-primary w-full" type="submit">
                 <Plus size={16} /> Add Fixed Expense
@@ -171,7 +201,7 @@ export default function FixedExpensesPage() {
                           {f.name}
                         </div>
                         <div className="text-xs text-slate-400">
-                          {f.category} · due day {f.dueDay}
+                          {f.category} · {FREQ_LABEL[f.frequency ?? "monthly"]} · day {f.dueDay}
                         </div>
                       </div>
                     </div>
