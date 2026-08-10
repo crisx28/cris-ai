@@ -145,7 +145,7 @@ export default function TravelPage() {
                 const p = travelProjection(f);
                 return (
                   <div key={f.id} className="card overflow-hidden">
-                    <div className="bg-gradient-to-r from-sky-500 to-cyan-500 px-5 py-4 text-white">
+                    <div className="bg-brand-500 px-5 py-4 text-white">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
                           <Plane size={18} />

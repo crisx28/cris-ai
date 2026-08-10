@@ -54,7 +54,7 @@ function LoginScreen() {
       <div className="w-full max-w-[380px] animate-fade-up">
         {/* Brand */}
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-[22px] bg-gradient-to-br from-brand-400 to-brand-600 text-4xl font-extrabold text-white shadow-float">
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-[16px] bg-brand-500 text-4xl font-semibold text-white">
             ₱
           </div>
           <h1 className="text-[26px] font-bold tracking-tight text-ink">

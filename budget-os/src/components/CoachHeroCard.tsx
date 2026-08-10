@@ -11,11 +11,13 @@ const ASKS = [
   "Am I on track for my goals?",
 ];
 
-// The AI Coach as the hero feature — makes it obvious what the AI can do.
+// A supporting card for the AI Coach. Deliberately NOT a hero: the design
+// authority puts cash, obligations, calendar, goals and reports ahead of AI,
+// so this carries the same quiet chrome as every other card on the page.
 export function CoachHeroCard({ message }: { message?: string }) {
   return (
-    <div className="rounded-4xl bg-gradient-to-br from-brand-500 to-brand-600 p-[1.5px] shadow-float">
-      <div className="rounded-[22px] bg-white p-5">
+    <div className="card">
+      <div className="p-5">
         <div className="flex items-center gap-2.5">
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-2xl">
             🤖

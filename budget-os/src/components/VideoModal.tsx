@@ -79,7 +79,7 @@ export function VideoModal({
             />
           )}
           {video.type === "none" && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-center text-white">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-brand-600 p-6 text-center text-white">
               <span className="text-4xl">🎬</span>
               <p className="text-[16px] font-semibold">Demo video coming soon</p>
               <p className="max-w-sm text-[13px] text-white/80">

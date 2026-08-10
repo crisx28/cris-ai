@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
           <TrendArea data={series} dataKey="expenses" name="Expenses" color="#f59e0b" />
         </SectionCard>
         <SectionCard title="Income Trend">
-          <TrendArea data={series} dataKey="income" name="Income" color="#6366f1" />
+          <TrendArea data={series} dataKey="income" name="Income" color="#0066cc" />
         </SectionCard>
       </div>
 
