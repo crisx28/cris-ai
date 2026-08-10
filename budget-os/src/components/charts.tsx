@@ -59,7 +59,7 @@ export function IncomeExpenseChart({
         />
         <Tooltip content={<MoneyTooltip />} cursor={{ fill: "#f1f5f9" }} />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-        <Bar dataKey="income" name="Income" fill="#6366f1" radius={[6, 6, 0, 0]} />
+        <Bar dataKey="income" name="Income" fill="#0066cc" radius={[6, 6, 0, 0]} />
         <Bar dataKey="expenses" name="Expenses" fill="#f59e0b" radius={[6, 6, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
@@ -164,7 +164,7 @@ export function CategoryCompareBar({
         <Tooltip content={<MoneyTooltip />} cursor={{ fill: "#f1f5f9" }} />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
         <Bar dataKey="lastAmt" name="Last month" fill="#cbd5e1" radius={[0, 6, 6, 0]} />
-        <Bar dataKey="thisAmt" name="This month" fill="#6366f1" radius={[0, 6, 6, 0]} />
+        <Bar dataKey="thisAmt" name="This month" fill="#0066cc" radius={[0, 6, 6, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -217,8 +217,8 @@ export function DebtPayoffChart({
       <AreaChart data={data}>
         <defs>
           <linearGradient id="grad-debt" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.35} />
-            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+            <stop offset="5%" stopColor="#0066cc" stopOpacity={0.35} />
+            <stop offset="95%" stopColor="#0066cc" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef2f6" />
@@ -235,7 +235,7 @@ export function DebtPayoffChart({
           type="monotone"
           dataKey="balance"
           name="Debt balance"
-          stroke="#8b5cf6"
+          stroke="#0066cc"
           strokeWidth={2.5}
           fill="url(#grad-debt)"
         />

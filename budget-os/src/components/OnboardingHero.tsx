@@ -81,7 +81,7 @@ export function OnboardingHero() {
           {/* Right: video thumbnail */}
           <button
             onClick={() => setVideoOpen(true)}
-            className="group relative min-h-[180px] bg-gradient-to-br from-brand-500 to-brand-700"
+            className="group relative min-h-[180px] bg-brand-600"
           >
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-float transition group-hover:scale-105">

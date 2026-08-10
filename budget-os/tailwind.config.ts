@@ -21,31 +21,37 @@ const config: Config = {
         warning: "#f59e0b",
         danger: "#ef4444",
 
-        // Accent (indigo) — replaces the old dominant green.
-        // `brand` is remapped to indigo so every existing brand-* class
-        // becomes the new accent automatically.
-        accent: "#6366f1",
+        // Accent — Apple Action Blue. See .claude/design.md: color usage is
+        // Apple's responsibility and Apple specifies exactly ONE interactive
+        // accent. `brand` is the alias every component already uses, so the
+        // whole app re-skins from this ramp alone. Nothing decorative may be
+        // painted in it.
+        accent: "#0066cc",
         brand: {
-          50: "#eef2ff",
-          100: "#e0e7ff",
-          200: "#c7d2fe",
-          300: "#a5b4fc",
-          400: "#818cf8",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
-          800: "#3730a3",
-          900: "#312e81",
+          50: "#f0f6fd",
+          100: "#e8f0fa",
+          200: "#c8ddf5",
+          300: "#8fbdea",
+          400: "#3d90db",
+          500: "#0066cc", // Action Blue — the single accent
+          600: "#005bb5",
+          700: "#004f9e",
+          800: "#003e7d",
+          900: "#002d5c",
         },
 
-        // Semantic tokens kept for category accents & links.
+        // On-dark link blue, for the rare accent on a dark surface where
+        // Action Blue would disappear (apple.md: "Sky Link Blue").
+        "accent-on-dark": "#2997ff",
+
+        // Category accents. Purple is deliberately absent — the design
+        // authority's Avoid list rules it out.
         ios: {
-          blue: "#6366f1", // links now use the indigo accent
+          blue: "#0066cc",
           green: "#22c55e",
           mint: "#14b8a6",
           teal: "#0ea5e9",
-          indigo: "#6366f1",
-          purple: "#8b5cf6",
+          indigo: "#0066cc",
           pink: "#ec4899",
           red: "#ef4444",
           orange: "#f59e0b",

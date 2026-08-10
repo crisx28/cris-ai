@@ -17,7 +17,7 @@ export function ModeChoice() {
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-10">
       <div className="w-full max-w-[440px] animate-fade-up">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-brand-400 to-brand-600 text-3xl font-extrabold text-white shadow-float">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[14px] bg-brand-500 text-3xl font-semibold text-white">
             ₱
           </div>
           <h1 className="text-[24px] font-bold tracking-tight text-ink">

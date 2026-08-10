@@ -2,28 +2,36 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { PanelRight, X } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useStore } from "@/lib/store";
 import { useWorkspace } from "@/lib/workspace";
 import { CoachPanel } from "@/components/CoachPanel";
 
-// Desktop left-sidebar navigation.
+const COACH_OPEN_KEY = "budget-os:coach-panel-open";
+
+// Desktop left-sidebar navigation. Order follows the feature priority in
+// .claude/design.md — Calendar sits with the core planning surfaces, and the
+// AI Coach ranks below them because it assists rather than leads.
 const NAV = [
   { href: "/", label: "Dashboard", emoji: "🏠", match: ["/"], tour: "" },
+  { href: "/calendar", label: "Calendar", emoji: "📅", match: ["/calendar"], tour: "" },
   { href: "/expenses", label: "Expenses", emoji: "💸", match: ["/expenses", "/income", "/fixed"], tour: "nav-expenses" },
   { href: "/savings", label: "Goals", emoji: "🎯", match: ["/savings", "/travel", "/debts"], tour: "" },
   { href: "/reports", label: "Reports", emoji: "📊", match: ["/reports", "/analytics"], tour: "nav-reports" },
-  { href: "/calendar", label: "Calendar", emoji: "📅", match: ["/calendar"], tour: "" },
   { href: "/assistant", label: "AI Coach", emoji: "🤖", match: ["/assistant"], tour: "" },
   { href: "/learn", label: "Learn", emoji: "❓", match: ["/learn"], tour: "" },
   { href: "/settings", label: "Settings", emoji: "⚙️", match: ["/settings"], tour: "" },
 ];
 
-// Mobile bottom tab bar.
+// Mobile bottom tab bar. Calendar holds the slot the AI Coach used to occupy;
+// the coach is reachable from the sidebar and the dashboard, not from a
+// permanent primary tab.
 const TABS = [
   { href: "/", label: "Home", emoji: "🏠", match: ["/"], tour: "" },
   { href: "/add", label: "Add", emoji: "➕", center: true, match: ["/add"], tour: "nav-expenses" },
-  { href: "/assistant", label: "Coach", emoji: "🤖", match: ["/assistant"], tour: "" },
+  { href: "/calendar", label: "Calendar", emoji: "📅", match: ["/calendar"], tour: "" },
   { href: "/savings", label: "Goals", emoji: "🎯", match: ["/savings", "/travel", "/debts"], tour: "" },
   { href: "/reports", label: "Reports", emoji: "📊", match: ["/reports", "/analytics"], tour: "nav-reports" },
 ];
@@ -36,8 +44,33 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isActive = (m: string[]) =>
     m.some((x) => (x === "/" ? pathname === "/" : pathname.startsWith(x)));
 
+  // The coach panel is opt-in and closed by default: AI assists, it never
+  // occupies the interface before the user asks for it. The choice persists so
+  // people who do want it open aren't re-opening it every page load.
+  const [coachOpen, setCoachOpen] = useState(false);
+  useEffect(() => {
+    try {
+      setCoachOpen(localStorage.getItem(COACH_OPEN_KEY) === "1");
+    } catch {
+      /* storage unavailable — stay closed */
+    }
+  }, []);
+
+  function toggleCoach() {
+    setCoachOpen((open) => {
+      const next = !open;
+      try {
+        localStorage.setItem(COACH_OPEN_KEY, next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
+
   // The AI Coach screen already is the chat — don't duplicate the panel there.
-  const showCoach = pathname !== "/assistant" && pathname !== "/add";
+  const coachAvailable = pathname !== "/assistant" && pathname !== "/add";
+  const showCoach = coachAvailable && coachOpen;
 
   return (
     <div className="min-h-screen">
@@ -56,7 +89,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
               )}
             </div>
-            <div className="text-[11px] text-subtle">AI Financial Coach</div>
+            <div className="text-[11px] text-subtle">Financial Planning</div>
           </div>
         </Link>
 
@@ -81,6 +114,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
+        {coachAvailable && (
+          <button
+            onClick={toggleCoach}
+            aria-pressed={coachOpen}
+            className={`mb-1 hidden items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition xl:flex ${
+              coachOpen
+                ? "bg-brand-50 text-brand-700"
+                : "text-subtle hover:bg-grouped hover:text-ink"
+            }`}
+          >
+            <PanelRight size={18} />
+            {coachOpen ? "Hide coach panel" : "Show coach panel"}
+          </button>
+        )}
+
         <button
           onClick={() => confirm("Sign out?") && signOut()}
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-grouped"
@@ -103,6 +151,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           data-tour="ai-coach"
           className="z-30 hidden border-l border-hairline bg-white px-4 py-5 xl:fixed xl:inset-y-0 xl:right-0 xl:flex xl:w-80 xl:flex-col xl:overflow-y-auto"
         >
+          <div className="mb-3 flex justify-end">
+            <button
+              onClick={toggleCoach}
+              aria-label="Hide coach panel"
+              className="rounded-lg p-1.5 text-subtle transition hover:bg-grouped hover:text-ink"
+            >
+              <X size={16} />
+            </button>
+          </div>
           <CoachPanel />
         </aside>
       )}
