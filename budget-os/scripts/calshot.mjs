@@ -1,0 +1,11 @@
+import { chromium } from "playwright-core";
+const EXE="/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
+const OUT="/tmp/claude-0/-home-user-cris-ai/926caced-4c23-548c-9eab-d06233ffb262/scratchpad/promo";
+const b=await chromium.launch({executablePath:EXE});
+const c=await b.newContext({viewport:{width:1440,height:1200},deviceScaleFactor:2});
+const p=await c.newPage();
+await p.addInitScript(()=>{localStorage.setItem("cris-budget-os:profile",JSON.stringify({name:"Maria"}));localStorage.setItem("cris-budget-os:mode","demo");localStorage.setItem("cris-budget-os:demo-meta",JSON.stringify({name:"The Santos Family"}));});
+await p.goto("http://localhost:3985/calendar",{waitUntil:"networkidle"});
+await p.waitForTimeout(1300);
+await p.screenshot({path:OUT+"/calendar-full.png"});
+await b.close();console.log("shot");

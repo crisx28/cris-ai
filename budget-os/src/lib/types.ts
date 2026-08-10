@@ -67,12 +67,33 @@ export interface Expense {
   notes?: string;
 }
 
+export type Frequency = "weekly" | "biweekly" | "monthly" | "quarterly" | "yearly";
+
+export const FREQUENCIES: Frequency[] = [
+  "weekly",
+  "biweekly",
+  "monthly",
+  "quarterly",
+  "yearly",
+];
+
+// How many times a year each frequency occurs (for monthly-equivalent math).
+export const FREQ_PER_YEAR: Record<Frequency, number> = {
+  weekly: 52,
+  biweekly: 26,
+  monthly: 12,
+  quarterly: 4,
+  yearly: 1,
+};
+
 export interface FixedExpense {
   id: string;
   name: string;
   category: ExpenseCategory;
   amount: number;
-  dueDay: number; // day of month, 1-31
+  dueDay: number; // day of month (used for monthly anchor / back-compat)
+  frequency: Frequency;
+  anchorDate?: string; // ISO — first/reference occurrence (drives non-monthly)
   active: boolean;
 }
 

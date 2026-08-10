@@ -171,12 +171,12 @@ export function buildDemoAccount(accountId = "santos"): BudgetData {
     incomes,
     expenses,
     fixedExpenses: [
-      { id: id("fix"), name: "Rent", category: "Rent", amount: round10(cfg.income * 0.25), dueDay: 5, active: true },
-      { id: id("fix"), name: "Electricity", category: "Utilities", amount: round10(cfg.income * 0.05), dueDay: 8, active: true },
-      { id: id("fix"), name: "Internet", category: "Internet", amount: round10(cfg.income * 0.022), dueDay: 10, active: true },
-      { id: id("fix"), name: "Mobile plan", category: "Mobile", amount: round10(cfg.income * 0.013), dueDay: 12, active: true },
+      { id: id("fix"), name: "Rent", category: "Rent" as ExpenseCategory, amount: round10(cfg.income * 0.25), dueDay: 5, frequency: "monthly" as const, active: true },
+      { id: id("fix"), name: "Electricity", category: "Utilities" as ExpenseCategory, amount: round10(cfg.income * 0.05), dueDay: 8, frequency: "monthly" as const, active: true },
+      { id: id("fix"), name: "Internet", category: "Internet" as ExpenseCategory, amount: round10(cfg.income * 0.022), dueDay: 10, frequency: "monthly" as const, active: true },
+      { id: id("fix"), name: "Mobile plan", category: "Mobile" as ExpenseCategory, amount: round10(cfg.income * 0.013), dueDay: 12, frequency: "monthly" as const, active: true },
       ...(cfg.kids
-        ? [{ id: id("fix"), name: "School service", category: "Child Expenses" as ExpenseCategory, amount: round10(cfg.income * 0.035), dueDay: 15, active: true }]
+        ? [{ id: id("fix"), name: "School service", category: "Child Expenses" as ExpenseCategory, amount: round10(cfg.income * 0.035), dueDay: 15, frequency: "monthly" as const, active: true }]
         : []),
     ],
     debts: cfg.debts.map((d) => ({ id: id("debt"), ...d })),
