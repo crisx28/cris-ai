@@ -179,7 +179,7 @@ export default function TravelPage() {
                         </div>
                       </div>
                       <div className="mt-2">
-                        <ProgressBar value={p.progress} color="#0ea5e9" />
+                        <ProgressBar value={p.progress} color="#c98d94" />
                       </div>
                       <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                         <div className="rounded-lg bg-slate-50 p-2">

@@ -98,13 +98,13 @@ export function CoachPanel() {
           <p className="mb-1.5 section-title">Goal progress</p>
           <div className="space-y-2">
             {emergencyP && (
-              <MiniProgress label="🛡️ Emergency Fund" value={emergencyP.progress} color="#22c55e" />
+              <MiniProgress label="🛡️ Emergency Fund" value={emergencyP.progress} color="#6f9350" />
             )}
             {tripP && trip && (
               <MiniProgress
                 label={`✈️ ${trip.destination.replace(/[^\w\s,.'-]/g, "").trim()}`}
                 value={tripP.progress}
-                color="#6366f1"
+                color="#c98d94"
               />
             )}
           </div>

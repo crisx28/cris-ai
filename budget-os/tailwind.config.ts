@@ -9,53 +9,61 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Calm, premium neutrals (Linear / Notion / Apple Health feel)
-        canvas: "#f8f8f7",
-        ink: "#111827",
-        subtle: "#6b7280",
-        hairline: "#e5e7eb",
-        grouped: "#f3f4f6",
+        // Warm, cozy neutrals — soft cream ground + warm ink
+        canvas: "#f7f2ea",
+        ink: "#3f3a31",
+        subtle: "#8c8578",
+        hairline: "#e8e0d3",
+        grouped: "#f0e9dd",
 
-        // Semantic
-        success: "#22c55e", // green — ONLY for positive financial health
-        warning: "#f59e0b",
-        danger: "#ef4444",
+        // Semantic (warm, softened)
+        success: "#6f9350", // sage-green for positive financial health
+        warning: "#cf9b3f", // mustard
+        danger: "#c37368", // terracotta
 
-        // Accent — Apple Action Blue. See .claude/design.md: color usage is
-        // Apple's responsibility and Apple specifies exactly ONE interactive
-        // accent. `brand` is the alias every component already uses, so the
-        // whole app re-skins from this ramp alone. Nothing decorative may be
-        // painted in it.
-        accent: "#0066cc",
+        // Accent — Sage. Following the single-accent discipline in
+        // .claude/design.md, `brand` remains the ONE interactive accent every
+        // component re-skins from; only its hue changes (Action Blue → Sage)
+        // for a warmer, more personal feel. Nothing decorative uses it.
+        accent: "#82964f",
         brand: {
-          50: "#f0f6fd",
-          100: "#e8f0fa",
-          200: "#c8ddf5",
-          300: "#8fbdea",
-          400: "#3d90db",
-          500: "#0066cc", // Action Blue — the single accent
-          600: "#005bb5",
-          700: "#004f9e",
-          800: "#003e7d",
-          900: "#002d5c",
+          50: "#f3f5ec",
+          100: "#e6ead6",
+          200: "#ccd5ae",
+          300: "#b0bd84",
+          400: "#97a664",
+          500: "#82964f", // Sage — the single accent
+          600: "#697b3f",
+          700: "#536032",
+          800: "#434d2b",
+          900: "#394126",
         },
 
-        // On-dark link blue, for the rare accent on a dark surface where
-        // Action Blue would disappear (apple.md: "Sky Link Blue").
-        "accent-on-dark": "#2997ff",
+        // On-dark accent, for the rare accent on a dark surface where the
+        // sage would disappear.
+        "accent-on-dark": "#b0bd84",
 
-        // Category accents. Purple is deliberately absent — the design
-        // authority's Avoid list rules it out.
+        // Blush — soft pink for warmth (travel, gentle highlights).
+        blush: {
+          50: "#fdf1ef",
+          100: "#f9e0dc",
+          200: "#f0c4bd",
+          300: "#e3a49b",
+          400: "#d68b81",
+          500: "#c67b71",
+        },
+
+        // Category accents — warm, earthy tones (no purple).
         ios: {
-          blue: "#0066cc",
-          green: "#22c55e",
-          mint: "#14b8a6",
-          teal: "#0ea5e9",
-          indigo: "#0066cc",
-          pink: "#ec4899",
-          red: "#ef4444",
-          orange: "#f59e0b",
-          yellow: "#eab308",
+          blue: "#82964f",
+          green: "#6f9350",
+          mint: "#8fb0a2",
+          teal: "#7fa8a0",
+          indigo: "#82964f",
+          pink: "#c98d94",
+          red: "#c37368",
+          orange: "#cf9b3f",
+          yellow: "#d9b53c",
         },
       },
       borderRadius: {
