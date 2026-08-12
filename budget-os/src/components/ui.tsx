@@ -64,7 +64,7 @@ export function StatCard({
 
 export function ProgressBar({
   value,
-  color = "#34c759",
+  color = "#6f9350",
   height = 10,
   animate = true,
 }: {

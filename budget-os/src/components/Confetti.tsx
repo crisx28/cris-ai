@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 
 const COLORS = [
-  "#34c759",
-  "#0a84ff",
-  "#ff9500",
-  "#ff2d55",
-  "#ffcc00",
-  "#5e5ce6",
-  "#00c7be",
+  "#82964f",
+  "#c98d94",
+  "#cf9b3f",
+  "#c37368",
+  "#d9b53c",
+  "#a98bb0",
+  "#7fa8a0",
 ];
 
 interface Piece {

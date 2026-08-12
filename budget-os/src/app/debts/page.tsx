@@ -238,7 +238,7 @@ export default function DebtsPage() {
                         <span>Pays: <b className="text-slate-700">{peso(d.monthlyPayment)}/mo</b></span>
                       </div>
                       <div className="mt-2">
-                        <ProgressBar value={paidGuess} color="#0066cc" height={6} />
+                        <ProgressBar value={paidGuess} color="#b0728a" height={6} />
                         <div className="mt-1 text-right text-[11px] text-slate-400">
                           ~{pct(paidGuess)} paid off
                         </div>

@@ -9,7 +9,7 @@ export function HealthRing({ score }: { score: number }) {
   const offset = circumference - (clamped / 100) * circumference;
 
   const color =
-    clamped >= 70 ? "#22c55e" : clamped >= 50 ? "#f59e0b" : "#ef4444";
+    clamped >= 70 ? "#6f9350" : clamped >= 50 ? "#cf9b3f" : "#c37368";
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -19,7 +19,7 @@ export function HealthRing({ score }: { score: number }) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#e5e7eb"
+          stroke="#e8e0d3"
           strokeWidth={stroke}
         />
         <circle
