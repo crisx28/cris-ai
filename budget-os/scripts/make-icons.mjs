@@ -16,7 +16,7 @@ function html(size, { rounded }) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>
     html,body{margin:0;padding:0;width:${size}px;height:${size}px;background:transparent}
     .box{width:${size}px;height:${size}px;border-radius:${radius}px;
-      background:linear-gradient(145deg,#97a664 0%,#586032 100%);
+      background:linear-gradient(145deg,#ef9fbb 0%,#dd6f92 100%);
       display:flex;align-items:center;justify-content:center;
       box-shadow:inset 0 ${Math.round(size*0.02)}px ${Math.round(size*0.06)}px rgba(255,255,255,0.25);
       font-family:-apple-system,'SF Pro Display','Segoe UI',Roboto,sans-serif;}

@@ -34,12 +34,12 @@ export interface HealthStatus {
 
 export function healthStatus(score: number): HealthStatus {
   if (score >= 80)
-    return { emoji: "🟢", label: "Excellent", color: "#5f7f3f", bg: "#eef2e2" };
+    return { emoji: "🟢", label: "Excellent", color: "#4d9a76", bg: "#e8f6f0" };
   if (score >= 60)
-    return { emoji: "🟡", label: "Stable", color: "#b8912f", bg: "#f7efd9" };
+    return { emoji: "🟡", label: "Stable", color: "#c99436", bg: "#fbf1dc" };
   if (score >= 40)
-    return { emoji: "🟠", label: "Watch Spending", color: "#c58a45", bg: "#f6ead9" };
-  return { emoji: "🔴", label: "Attention Needed", color: "#c37368", bg: "#f7e6e2" };
+    return { emoji: "🟠", label: "Watch Spending", color: "#d99a4a", bg: "#fbeeda" };
+  return { emoji: "🔴", label: "Attention Needed", color: "#e17b84", bg: "#fdeaec" };
 }
 
 export interface Insight {

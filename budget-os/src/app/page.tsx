@@ -245,7 +245,7 @@ export default function DashboardPage() {
             title="Emergency Fund"
             current={emergency.current}
             target={emergency.target}
-            color="#6f9350"
+            color="#5fb08a"
             stats={[
               {
                 label: "Need / month",
@@ -270,7 +270,7 @@ export default function DashboardPage() {
             title={trip.destination.replace(/[^\w\s,.'-]/g, "").trim()}
             current={trip.current}
             target={trip.target}
-            color="#c98d94"
+            color="#5fb3c9"
             stats={[
               { label: "Still needed", value: peso(tripP.stillNeeded) },
               {
@@ -299,7 +299,7 @@ export default function DashboardPage() {
                     {b.points}/{b.max}
                   </span>
                 </div>
-                <ProgressBar value={(b.points / b.max) * 100} height={5} color="#82964f" />
+                <ProgressBar value={(b.points / b.max) * 100} height={5} color="#dd6f92" />
               </div>
             ))}
           </div>

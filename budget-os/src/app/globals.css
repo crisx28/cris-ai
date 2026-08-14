@@ -9,8 +9,8 @@ body {
 }
 
 body {
-  background: #f7f2ea;
-  color: #3f3a31;
+  background: #fcf6f5;
+  color: #4a4551;
   font-family: var(--tw-font-sans, -apple-system, BlinkMacSystemFont, "SF Pro Display",
     "Inter", "Segoe UI", Roboto, system-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
@@ -20,14 +20,14 @@ body {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d8cfbf transparent;
+  scrollbar-color: #e7d3dd transparent;
 }
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #d8cfbf;
+  background: #e7d3dd;
   border-radius: 999px;
 }
 
