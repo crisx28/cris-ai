@@ -9,61 +9,70 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Warm, cozy neutrals — soft cream ground + warm ink
-        canvas: "#f7f2ea",
-        ink: "#3f3a31",
-        subtle: "#8c8578",
-        hairline: "#e8e0d3",
-        grouped: "#f0e9dd",
+        // Youthful pastel neutrals — soft blush-cream ground + gentle ink
+        canvas: "#fcf6f5",
+        ink: "#4a4551",
+        subtle: "#9a8f98",
+        hairline: "#f0e4ea",
+        grouped: "#f8eef2",
 
-        // Semantic (warm, softened)
-        success: "#6f9350", // sage-green for positive financial health
-        warning: "#cf9b3f", // mustard
-        danger: "#c37368", // terracotta
+        // Semantic (soft pastels, still readable)
+        success: "#5fb08a", // pastel mint-green for positive health
+        warning: "#e3ac52", // soft butter
+        danger: "#e17b84", // soft coral
 
-        // Accent — Sage. Following the single-accent discipline in
+        // Accent — pastel Rose. Following the single-accent discipline in
         // .claude/design.md, `brand` remains the ONE interactive accent every
-        // component re-skins from; only its hue changes (Action Blue → Sage)
-        // for a warmer, more personal feel. Nothing decorative uses it.
-        accent: "#82964f",
+        // component re-skins from; only its hue changes for a youthful,
+        // playful pastel feel. Nothing decorative uses it.
+        accent: "#dd6f92",
         brand: {
-          50: "#f3f5ec",
-          100: "#e6ead6",
-          200: "#ccd5ae",
-          300: "#b0bd84",
-          400: "#97a664",
-          500: "#82964f", // Sage — the single accent
-          600: "#697b3f",
-          700: "#536032",
-          800: "#434d2b",
-          900: "#394126",
+          50: "#fdf2f6",
+          100: "#fbe3ec",
+          200: "#f6c4d6",
+          300: "#ef9fbb",
+          400: "#e781a3",
+          500: "#dd6f92", // pastel Rose — the single accent
+          600: "#c8577c",
+          700: "#a84667",
+          800: "#8a3a55",
+          900: "#723147",
         },
 
-        // On-dark accent, for the rare accent on a dark surface where the
-        // sage would disappear.
-        "accent-on-dark": "#b0bd84",
+        // On-dark accent, for the rare accent on a dark surface.
+        "accent-on-dark": "#f6c4d6",
 
-        // Blush — soft pink for warmth (travel, gentle highlights).
+        // Sky — pastel baby-blue secondary (travel, gentle highlights).
+        sky: {
+          50: "#eff8fb",
+          100: "#dceff5",
+          200: "#bce0ec",
+          300: "#93cce0",
+          400: "#66b4d3",
+          500: "#4fa3c6",
+        },
+
+        // Blush — extra-soft pink tint.
         blush: {
-          50: "#fdf1ef",
-          100: "#f9e0dc",
-          200: "#f0c4bd",
-          300: "#e3a49b",
-          400: "#d68b81",
-          500: "#c67b71",
+          50: "#fdf2f5",
+          100: "#fbe3ec",
+          200: "#f6c4d6",
+          300: "#ef9fbb",
+          400: "#e781a3",
+          500: "#dd6f92",
         },
 
-        // Category accents — warm, earthy tones (no purple).
+        // Category accents — soft candy pastels.
         ios: {
-          blue: "#82964f",
-          green: "#6f9350",
-          mint: "#8fb0a2",
-          teal: "#7fa8a0",
-          indigo: "#82964f",
-          pink: "#c98d94",
-          red: "#c37368",
-          orange: "#cf9b3f",
-          yellow: "#d9b53c",
+          blue: "#dd6f92",
+          green: "#5fb08a",
+          mint: "#7fc7be",
+          teal: "#5fb3c9",
+          indigo: "#dd6f92",
+          pink: "#ef9db4",
+          red: "#e17b84",
+          orange: "#e3ac52",
+          yellow: "#e8c65e",
         },
       },
       borderRadius: {
