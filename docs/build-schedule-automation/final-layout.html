@@ -1,0 +1,268 @@
+<title>Build Schedule Final Layout</title>
+<style>
+  :root{
+    --bg:#10121A; --panel:#171A24; --panel-2:#1D2130; --border:#2A2E3D;
+    --ink:#EDEFF6; --ink-muted:#8A90A6; --ink-faint:#5B6178;
+    --lime:#B7D33C; --lime-soft:#3A421A;
+    --amber:#D9A441; --amber-soft:#3D3117;
+    --blue:#5B9BD1; --blue-soft:#182A3A;
+    --olive:#8A9A4E; --olive-soft:#2A3018;
+    --ooo:#C06A5B; --ooo-soft:#3A2119;
+    --flag:#D9A441;
+    --info:#B7D33C; --info-soft:#262D14;
+    --callout:#E8C15A; --callout-ink:#14161C;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5;padding-inline:16px;}
+  .page{max-width:1180px;margin:0 auto;padding-block:32px 64px;}
+
+  .intro{margin-bottom:20px;}
+  .intro .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--callout);margin-bottom:8px;}
+  .intro h1{font-size:21px;font-weight:700;margin:0 0 8px;}
+  .intro p{color:var(--ink-muted);max-width:74ch;margin:0;font-size:13.5px;}
+
+  .app{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px 22px 18px;}
+
+  .top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+  .top-row h2{font-size:19px;font-weight:700;margin:0 0 6px;}
+  .top-row p{color:var(--ink-muted);font-size:12.5px;max-width:60ch;margin:0;}
+  .add-btn{background:var(--lime);color:#1A1F0A;font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;flex:none;white-space:nowrap;}
+
+  /* 1. SUMMARY BAND — always first, above everything else */
+  .summary-band{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;padding:14px 16px;background:var(--info-soft);border:1px solid var(--info);border-radius:10px;}
+  .summary-band .stat{flex:1;min-width:220px;}
+  .summary-band .stat .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--info);margin-bottom:3px;}
+  .summary-band .stat .v{font-size:14px;font-weight:600;}
+  .summary-band .stat .v .accent{color:var(--info);}
+  .summary-band .note{width:100%;font-size:11px;color:var(--ink-faint);padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);margin-top:2px;}
+
+  /* legend now lives right under the summary band, not at the page bottom */
+  .legend-row{display:flex;flex-wrap:wrap;gap:14px;padding:9px 14px;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;margin-bottom:18px;font-size:11.5px;color:var(--ink-muted);}
+  .legend-row .dot{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:6px;}
+
+  .kickoff-card{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden;}
+  .kickoff-card .card-label{padding:10px 14px;font-size:12px;color:var(--ink-muted);border-bottom:1px solid var(--border);}
+  .krow{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border);font-size:13px;}
+  .krow:last-child{border-bottom:none;}
+  .krow .status-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .krow .name{font-weight:600;min-width:140px;}
+  .krow .sub{color:var(--ink-muted);font-size:12px;}
+  .status-none{background:var(--ink-faint);}
+  .status-booked{background:var(--blue);}
+  .status-flag{background:var(--flag);}
+
+  .gantt{border:1px solid var(--border);border-radius:10px;overflow:visible;}
+  .gantt-header{display:grid;grid-template-columns:250px 1fr;background:var(--panel-2);border-bottom:1px solid var(--border);border-top-left-radius:9px;border-top-right-radius:9px;}
+  .gantt-header .dates{display:grid;grid-template-columns:repeat(6,1fr);font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-faint);padding:8px 10px;}
+  .gantt-header .client-col{padding:8px 12px;font-size:11px;color:var(--ink-faint);border-right:1px solid var(--border);}
+
+  .ooo-lane{display:grid;grid-template-columns:250px 1fr;border-bottom:1px solid var(--border);background:var(--panel);}
+  .ooo-lane .label{padding:8px 12px;font-size:11px;color:var(--ink-muted);border-right:1px solid var(--border);display:flex;align-items:center;}
+  .ooo-lane .track{position:relative;height:26px;}
+  .ooo-block{position:absolute;top:4px;height:18px;background:var(--ooo-soft);border:1px dashed var(--ooo);border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:9.5px;color:var(--ooo);font-family:"IBM Plex Mono",monospace;white-space:nowrap;}
+
+  /* fixed row height — issue 2 */
+  .grow{display:grid;grid-template-columns:250px 1fr;border-bottom:1px solid var(--border);min-height:72px;}
+  .grow:last-child{border-bottom:none;}
+  .grow .client{padding:8px 12px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0;}
+  .grow .client .cname{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px;min-width:0;}
+  /* issue 1 fix — name gets room to breathe, ellipsis + title, tag never eats its space */
+  .grow .client .cname .clip{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex-shrink:1;}
+  .builder-tag{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink-muted);background:var(--panel-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;flex:none;}
+  .grow .client .meta{font-size:11px;color:var(--ink-muted);}
+  .grow .track{position:relative;padding:14px 10px;}
+  .bar{position:absolute;top:14px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;color:#0E1006;font-family:"IBM Plex Mono",monospace;overflow:visible;white-space:nowrap;cursor:default;}
+  .bar.scope{background:var(--amber);}
+  .bar.prebuild{background:var(--blue);color:#0B1B26;}
+  .bar.build{background:var(--lime);}
+  .bar.refine{background:var(--olive);color:#12160A;}
+  .bar.tentative{background:transparent;border:1.5px dashed var(--lime);color:var(--lime);}
+  .bar.capacity{background:var(--info-soft);border:none;color:var(--info);font-weight:500;}
+  .bar > span.label{overflow:hidden;text-overflow:ellipsis;}
+
+  /* hover / focus detail — issue 6 in section 10: status, dates, provenance, no ceremony */
+  .bar-tip{
+    position:absolute;bottom:calc(100% + 9px);left:50%;
+    transform:translateX(-50%) translateY(3px);
+    background:var(--panel-2);border:1px solid var(--border);border-radius:6px;
+    padding:8px 11px;min-width:150px;
+    font-family:"Inter",sans-serif;font-weight:500;white-space:normal;
+    opacity:0;pointer-events:none;z-index:20;
+    transition:opacity .12s ease, transform .12s ease;
+  }
+  .bar:hover .bar-tip,.bar:focus-visible .bar-tip{opacity:1;transform:translateX(-50%) translateY(0);}
+  .bar-tip .tip-phase{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+  .bar-tip .tip-dates{font-size:10.5px;color:var(--ink-muted);font-family:"IBM Plex Mono",monospace;margin-bottom:3px;}
+  .bar-tip .tip-status{font-size:10.5px;color:var(--ink-muted);display:flex;align-items:center;gap:5px;}
+  .bar-tip .tip-status .pin-dot{width:6px;height:6px;border-radius:50%;flex:none;background:var(--ink-faint);}
+  .bar-tip .tip-status.pinned .pin-dot{background:var(--callout);}
+  .bar-tip .tip-status.pinned{color:var(--callout);}
+  @media (prefers-reduced-motion: reduce){ .bar-tip{transition:none;} }
+  /* issue 4 fix — right-edge fade + chevron */
+  .fade-edge{position:absolute;top:14px;right:0;width:22px;height:22px;background:linear-gradient(to right, transparent, var(--ooo-soft) 70%);display:flex;align-items:center;justify-content:flex-end;}
+  .fade-edge::after{content:"›";color:var(--ooo);font-weight:700;font-size:13px;padding-right:2px;}
+
+  .callout-flag{position:absolute;width:20px;height:20px;border-radius:5px;background:var(--callout);color:var(--callout-ink);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;z-index:5;box-shadow:0 0 0 2px var(--bg);}
+
+  footer{margin-top:24px;font-size:11px;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace;}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap">
+
+<div class="page">
+
+  <div class="intro">
+    <div class="eyebrow">Final layout · Build Schedule · corrected order + hover detail, v4</div>
+    <h1>Capacity band leads, Gantt chart next, awaiting list last</h1>
+    <p>Final order: capacity summary first (above everything), then the Gantt chart with its legend directly beneath it, then the awaiting-kickoff list last as the least time-sensitive content. All 7 layout fixes carry over unchanged, plus one addition: hover or focus any bar to see its phase, date range, and status — the item from section 10 of the spec, "Hover detail." Try it below.</p>
+  </div>
+
+  <div class="app">
+    <div class="top-row">
+      <div>
+        <h2>Build Schedule</h2>
+        <p>Where builds currently sit, so you can see open slots on a sales call.</p>
+      </div>
+      <div class="add-btn">+ Add build</div>
+    </div>
+
+    <!-- 1. Capacity summary — leads, above the chart it summarizes -->
+    <div class="summary-band" style="margin-bottom:14px;">
+      <div class="stat">
+        <div class="k">Capacity (Jack)</div>
+        <div class="v">Full at <span class="accent">2 concurrent builds</span> (refinement doesn't count)</div>
+      </div>
+      <div class="stat">
+        <div class="k">Next open window</div>
+        <div class="v"><span class="accent">21 Sept – 4 Oct</span></div>
+      </div>
+      <div class="stat">
+        <div class="k">Jack OOO</div>
+        <div class="v">No OOO logged against a scheduled build</div>
+      </div>
+      <div class="note">Informational only — never writes or proposes a date</div>
+    </div>
+
+    <!-- 2. Gantt chart — primary schedule content, right under the capacity summary -->
+    <div class="gantt" style="margin-bottom:14px;">
+      <div class="gantt-header">
+        <div class="client-col">Client / label</div>
+        <div class="dates"><span>13 Jul</span><span>3 Aug</span><span>24 Aug</span><span>7 Sept</span><span>21 Sept</span><span>5 Oct</span></div>
+      </div>
+
+      <div class="ooo-lane">
+        <div class="label">Jack</div>
+        <div class="track">
+          <!-- currently empty in real data — true negative, not rendered as broken -->
+        </div>
+      </div>
+
+      <!-- issue 1 + 2 fix: name gets full width via ellipsis+title, tag no longer collides; fixed row height -->
+      <div class="grow">
+        <div class="client">
+          <div class="cname"><span class="clip" title="Nathan Dart">Nathan Dart</span><span class="builder-tag">nick</span></div>
+          <div class="meta">Status Technology · Kickoff 30 Aug</div>
+        </div>
+        <div class="track">
+          <div class="bar scope" style="left:5%; width:10%;" tabindex="0"><span class="label">Scope</span>
+            <div class="bar-tip"><div class="tip-phase">Scope → SOW due</div><div class="tip-dates">14 Jul – 24 Jul</div><div class="tip-status pinned"><span class="pin-dot"></span>Scope call pinned by Polly</div></div>
+          </div>
+          <div class="bar build" style="left:56%; width:16%;" tabindex="0"><span class="label">Build</span>
+            <div class="bar-tip"><div class="tip-phase">Build</div><div class="tip-dates">30 Aug – 13 Sept · 14-day window</div><div class="tip-status"><span class="pin-dot"></span>Builder: Nick</div></div>
+          </div>
+          <div class="bar refine" style="left:72%; width:20%;" tabindex="0"><span class="label">Refinement</span>
+            <div class="bar-tip"><div class="tip-phase">Refinement</div><div class="tip-dates">13 Sept – 11 Oct · 4-week window</div><div class="tip-status"><span class="pin-dot"></span>Auto-derived from build start</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grow">
+        <div class="client">
+          <div class="cname"><span class="clip" title="Maria Florou">Maria Florou</span><span class="builder-tag">manny</span></div>
+          <div class="meta">Kickoff 7 Sept · Scope 28 Aug · SOW 2 Sept · Access 7 Sept</div>
+        </div>
+        <div class="track">
+          <div class="bar scope" style="left:26%; width:8%;" tabindex="0"><span class="label">Scope</span>
+            <div class="bar-tip"><div class="tip-phase">Scope → SOW due</div><div class="tip-dates">28 Aug – 2 Sept</div><div class="tip-status"><span class="pin-dot"></span>Auto-derived from build record</div></div>
+          </div>
+          <div class="bar prebuild" style="left:35%; width:8%;" tabindex="0"><span class="label">Pre-Build</span>
+            <div class="bar-tip"><div class="tip-phase">Pre-Build</div><div class="tip-dates">2 Sept – 7 Sept</div><div class="tip-status pinned"><span class="pin-dot"></span>Access-ready pinned</div></div>
+          </div>
+          <div class="bar build" style="left:47%; width:16%;" tabindex="0"><span class="label">Build</span>
+            <div class="bar-tip"><div class="tip-phase">Build</div><div class="tip-dates">7 Sept – 21 Sept · 14-day window</div><div class="tip-status"><span class="pin-dot"></span>Builder: Manny</div></div>
+          </div>
+          <div class="bar refine" style="left:63%; width:20%;" tabindex="0"><span class="label">Refinement</span>
+            <div class="bar-tip"><div class="tip-phase">Refinement</div><div class="tip-dates">21 Sept – 19 Oct · 4-week window</div><div class="tip-status"><span class="pin-dot"></span>Auto-derived from build start</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- issue 5 fix: on-bar label for the tentative state -->
+      <div class="grow">
+        <div class="client">
+          <div class="cname"><span class="clip" title="Nicholas Bletsis">Nicholas Bletsis</span><span class="builder-tag" style="color:var(--ink-faint)">—</span></div>
+          <div class="meta">Discovery 27 Aug · Kickoff 21 Sept (tentative)</div>
+        </div>
+        <div class="track">
+          <div class="bar scope" style="left:33%; width:7%;" tabindex="0"><span class="label">Scope</span>
+            <div class="bar-tip"><div class="tip-phase">Scope → SOW due</div><div class="tip-dates">27 Aug – 3 Sept</div><div class="tip-status"><span class="pin-dot"></span>Auto-derived from build record</div></div>
+          </div>
+          <div class="bar tentative" style="left:72%; width:18%;" tabindex="0"><span class="label">Tentative kickoff</span>
+            <div class="bar-tip"><div class="tip-phase">Tentative kickoff</div><div class="tip-dates">21 Sept</div><div class="tip-status"><span class="pin-dot"></span>Not confirmed — capacity-permitting</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- issue 4 fix: right-edge fade + chevron -->
+      <div class="grow" style="position:relative;">
+        <div class="client">
+          <div class="cname"><span class="clip" title="Danielle Dwyer">Danielle Dwyer</span><span class="builder-tag" style="color:var(--ink-faint)">—</span></div>
+          <div class="meta">Kickoff 5 Oct · Scope 7 Sept · SOW 12 Sept · Access 1 Oct</div>
+        </div>
+        <div class="track">
+          <div class="bar scope" style="left:52%; width:8%;" tabindex="0"><span class="label">Scope</span>
+            <div class="bar-tip"><div class="tip-phase">Scope → SOW due</div><div class="tip-dates">7 Sept – 12 Sept</div><div class="tip-status"><span class="pin-dot"></span>Auto-derived from build record</div></div>
+          </div>
+          <div class="bar prebuild" style="left:60%; width:42%;" tabindex="0"><span class="label">Pre-Build</span>
+            <div class="bar-tip"><div class="tip-phase">Pre-Build</div><div class="tip-dates">12 Sept – 1 Oct</div><div class="tip-status pinned"><span class="pin-dot"></span>Access-ready pinned</div></div>
+          </div>
+          <div class="fade-edge"></div>
+        </div>
+      </div>
+
+      <div class="grow">
+        <div class="client">
+          <div class="cname"><span class="clip">+ New client</span></div>
+          <div class="meta" style="font-style:italic;">unplaced</div>
+        </div>
+        <div class="track">
+          <div class="bar capacity" style="left:82%; width:16%;" tabindex="0"><span class="label">Open window</span>
+            <div class="bar-tip"><div class="tip-phase">Open window</div><div class="tip-dates">21 Sept – 4 Oct</div><div class="tip-status"><span class="pin-dot"></span>No client assigned — flag only, never auto-booked</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- legend sits directly under the chart it explains -->
+    <div class="legend-row" style="margin-bottom:14px;">
+      <span><span class="dot" style="background:var(--amber)"></span>Scope → SOW due</span>
+      <span><span class="dot" style="background:var(--blue)"></span>Pre-Build</span>
+      <span><span class="dot" style="background:var(--lime)"></span>Build</span>
+      <span><span class="dot" style="background:var(--olive)"></span>Refinement</span>
+      <span><span class="dot" style="background:var(--ooo)"></span>Jack OOO / blocked</span>
+      <span><span class="dot" style="background:var(--info)"></span>Open window (flag only)</span>
+    </div>
+
+    <!-- 3. Awaiting list — least time-sensitive, sits last. Urgency signal — issue 3 fix -->
+    <div class="kickoff-card">
+      <div class="card-label">Awaiting kickoff date</div>
+      <div class="krow"><span class="status-dot status-none"></span><span class="name">Helen Nguyen</span><span class="sub">No dates set yet</span></div>
+      <div class="krow"><span class="status-dot status-none"></span><span class="name">Julio Rojas</span><span class="sub">No dates set yet</span></div>
+      <div class="krow"><span class="status-dot status-booked"></span><span class="name">Liuba Moghilco</span><span class="sub">Scope call 2 Sept</span></div>
+      <div class="krow"><span class="status-dot status-flag"></span><span class="name">Angelina Badri</span><span class="sub">Scope call 22 July — oldest open scope call, flagged</span></div>
+    </div>
+
+  </div>
+
+  <footer>Build Schedule — final layout v4 · capacity, then Gantt, then awaiting list · hover a bar for detail</footer>
+
+</div>

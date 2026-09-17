@@ -1,0 +1,244 @@
+<title>Build Schedule Target Design</title>
+<style>
+  :root{
+    --bg:#10121A;
+    --panel:#171A24;
+    --panel-2:#1D2130;
+    --border:#2A2E3D;
+    --ink:#EDEFF6;
+    --ink-muted:#8A90A6;
+    --ink-faint:#5B6178;
+    --lime:#B7D33C;
+    --lime-soft:#3A421A;
+    --amber:#D9A441;
+    --amber-soft:#3D3117;
+    --blue:#5B9BD1;
+    --blue-soft:#182A3A;
+    --olive:#8A9A4E;
+    --olive-soft:#2A3018;
+    --ooo:#C06A5B;
+    --ooo-soft:#3A2119;
+    --flag:#D9A441;
+    --info:#6FB4A8;
+    --info-soft:#182F2B;
+    --callout:#E8C15A;
+    --callout-ink:#14161C;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5;padding-inline:16px;}
+  .page{max-width:1180px;margin:0 auto;padding-block:32px 64px;}
+
+  .intro{margin-bottom:22px;}
+  .intro .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--callout);margin-bottom:8px;}
+  .intro h1{font-size:22px;font-weight:700;margin:0 0 8px;color:var(--ink);}
+  .intro p{color:var(--ink-muted);max-width:70ch;margin:0;font-size:13.5px;}
+
+  .key{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 26px;padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;}
+  .key .item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--ink-muted);width:calc(33% - 8px);min-width:260px;}
+  .key .num{flex:none;width:18px;height:18px;border-radius:5px;background:var(--callout);color:var(--callout-ink);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;}
+
+  .mock{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px 22px 18px;position:relative;}
+
+  .mock-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+  .mock-top h2{font-size:19px;font-weight:700;margin:0 0 6px;}
+  .mock-top p{color:var(--ink-muted);font-size:12.5px;max-width:60ch;margin:0;}
+  .add-btn{background:var(--lime);color:#1A1F0A;font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;flex:none;}
+
+  .legend-row{display:flex;flex-wrap:wrap;gap:16px;padding:10px 14px;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;margin-bottom:18px;font-size:12px;color:var(--ink-muted);position:relative;}
+  .legend-row .dot{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:6px;}
+
+  .forecast-tile{display:flex;gap:14px;margin-bottom:18px;}
+  .tile{flex:1;background:var(--info-soft);border:1px solid var(--info);border-radius:10px;padding:12px 14px;position:relative;}
+  .tile .label{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:0.05em;text-transform:uppercase;color:var(--info);margin-bottom:4px;}
+  .tile .value{font-size:14.5px;font-weight:600;color:var(--ink);}
+  .tile .sub{font-size:11.5px;color:var(--ink-muted);margin-top:2px;}
+
+  .kickoff-card{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden;position:relative;}
+  .kickoff-card .card-label{padding:10px 14px;font-size:12px;color:var(--ink-muted);border-bottom:1px solid var(--border);}
+  .krow{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border);font-size:13px;}
+  .krow:last-child{border-bottom:none;}
+  .krow .status-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .krow .name{font-weight:600;min-width:140px;}
+  .krow .sub{color:var(--ink-muted);font-size:12px;}
+  .status-none{background:var(--ink-faint);}
+  .status-booked{background:var(--blue);}
+  .status-flag{background:var(--flag);}
+
+  .gantt{border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
+  .gantt-header{display:grid;grid-template-columns:220px 1fr;background:var(--panel-2);border-bottom:1px solid var(--border);}
+  .gantt-header .dates{display:grid;grid-template-columns:repeat(6,1fr);font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-faint);padding:8px 10px;}
+  .gantt-header .client-col{padding:8px 12px;font-size:11px;color:var(--ink-faint);border-right:1px solid var(--border);}
+
+  .ooo-lane{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid var(--border);background:var(--panel);position:relative;}
+  .ooo-lane .label{padding:8px 12px;font-size:11px;color:var(--ink-muted);border-right:1px solid var(--border);display:flex;align-items:center;}
+  .ooo-lane .track{position:relative;height:26px;}
+  .ooo-block{position:absolute;top:4px;height:18px;background:var(--ooo-soft);border:1px dashed var(--ooo);border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:9.5px;color:var(--ooo);font-family:"IBM Plex Mono",monospace;white-space:nowrap;overflow:hidden;}
+
+  .grow{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid var(--border);min-height:64px;}
+  .grow:last-child{border-bottom:none;}
+  .grow .client{padding:8px 12px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:2px;}
+  .grow .client .cname{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px;}
+  .grow .client .cname .clip{max-width:118px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .builder-tag{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink-muted);background:var(--panel-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;flex:none;}
+  .grow .client .meta{font-size:11px;color:var(--ink-muted);}
+  .grow .track{position:relative;padding:12px 10px;}
+  .bar{position:absolute;top:12px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;color:#0E1006;font-family:"IBM Plex Mono",monospace;overflow:hidden;white-space:nowrap;}
+  .bar.scope{background:var(--amber);}
+  .bar.prebuild{background:var(--blue);color:#0B1B26;}
+  .bar.build{background:var(--lime);}
+  .bar.refine{background:var(--olive);color:#12160A;}
+  .bar.tentative{background:transparent;border:1.5px dashed var(--lime);color:var(--lime);}
+  .bar.capacity{background:var(--info-soft);border:none;color:var(--info);font-weight:500;}
+  .fade-edge{position:absolute;top:12px;right:0;width:22px;height:22px;background:linear-gradient(to right, transparent, var(--ooo-soft) 70%);display:flex;align-items:center;justify-content:flex-end;}
+  .fade-edge::after{content:"›";color:var(--ooo);font-weight:700;font-size:13px;padding-right:2px;}
+
+  .callout-flag{position:absolute;width:20px;height:20px;border-radius:5px;background:var(--callout);color:var(--callout-ink);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;z-index:5;box-shadow:0 0 0 2px var(--bg);}
+
+  footer{margin-top:26px;font-size:11.5px;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace;}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap">
+
+<div class="page">
+
+  <div class="intro">
+    <div class="eyebrow">Target design · Build Schedule</div>
+    <h1>What the finished view should look like</h1>
+    <p>One mockup, real client names and dates from tonight's screenshots — every numbered marker below ties back to a fix from the visual audit or a feature from the automation spec. This is the target Joaquin builds toward, not a literal pixel spec.</p>
+  </div>
+
+  <div class="key">
+    <div class="item"><span class="num">1</span>Legend moved up, next to the chart — not buried below it, and sized for 6 entries.</div>
+    <div class="item"><span class="num">2</span>Forecast tile: next open window + Jack's build-phase load. Flag only, never a proposed date.</div>
+    <div class="item"><span class="num">3</span>Awaiting-kickoff rows colored by state — no dates set vs. booked vs. flagged/stale.</div>
+    <div class="item"><span class="num">4</span>Jack's real OOO/vacation as one shared lane at the top of the chart, not per client.</div>
+    <div class="item"><span class="num">5</span>Fixed row height across every client — bars align on one grid regardless of metadata length.</div>
+    <div class="item"><span class="num">6</span>Full name on hover; never silently clipped with no way to read it.</div>
+    <div class="item"><span class="num">7</span>lead_builder shown as a tag next to the name — read-only, "?" renders as unassigned.</div>
+    <div class="item"><span class="num">8</span>Every bar carries its own short label — no state (tentative, open window) relies on aside text alone.</div>
+    <div class="item"><span class="num">9</span>Right-edge fade + chevron wherever a bar's real end date runs past the visible range.</div>
+  </div>
+
+  <div class="mock">
+    <div class="callout-flag" style="top:20px; right:150px;">1</div>
+    <div class="mock-top">
+      <div>
+        <h2>Build Schedule</h2>
+        <p>Where builds currently sit, so you can see open slots on a sales call. Add a scope call date to see the SOW-due window.</p>
+      </div>
+      <div class="add-btn">+ Add build</div>
+    </div>
+
+    <div class="legend-row">
+      <span><span class="dot" style="background:var(--amber)"></span>Scope → SOW due</span>
+      <span><span class="dot" style="background:var(--blue)"></span>Pre-Build</span>
+      <span><span class="dot" style="background:var(--lime)"></span>Build</span>
+      <span><span class="dot" style="background:var(--olive)"></span>Refinement</span>
+      <span><span class="dot" style="background:var(--ooo)"></span>Jack OOO / vacation</span>
+      <span><span class="dot" style="background:var(--info)"></span>Open window (flag only)</span>
+    </div>
+
+    <div class="forecast-tile" style="position:relative;">
+      <div class="callout-flag" style="top:-10px; left:-10px;">2</div>
+      <div class="tile">
+        <div class="label">Next open build window</div>
+        <div class="value">12 Oct – 26 Oct</div>
+        <div class="sub">Informational — enter the date manually to commit it</div>
+      </div>
+      <div class="tile">
+        <div class="label">Jack's current load</div>
+        <div class="value">1 of 2 build-phase slots used</div>
+        <div class="sub">Refinement doesn't count toward full</div>
+      </div>
+    </div>
+
+    <div class="kickoff-card" style="position:relative;">
+      <div class="callout-flag" style="top:-10px; left:-10px;">3</div>
+      <div class="card-label">Awaiting kickoff date</div>
+      <div class="krow"><span class="status-dot status-none"></span><span class="name">Helen Nguyen</span><span class="sub">No dates set yet</span></div>
+      <div class="krow"><span class="status-dot status-none"></span><span class="name">Dylan Yard</span><span class="sub">No dates set yet</span></div>
+      <div class="krow"><span class="status-dot status-booked"></span><span class="name">Jess Plane</span><span class="sub">Scope call 5 Sept</span></div>
+      <div class="krow"><span class="status-dot status-flag"></span><span class="name">Angelina Badri</span><span class="sub">Scope call 22 July — oldest open scope call, flagged</span></div>
+    </div>
+
+    <div class="gantt" style="position:relative;">
+      <div class="callout-flag" style="top:-10px; left:210px;">4</div>
+      <div class="gantt-header">
+        <div class="client-col">Client / label</div>
+        <div class="dates"><span>13 Jul</span><span>3 Aug</span><span>24 Aug</span><span>7 Sept</span><span>21 Sept</span><span>5 Oct</span></div>
+      </div>
+
+      <div class="ooo-lane">
+        <div class="label">Jack</div>
+        <div class="track">
+          <div class="ooo-block" style="left:62%; width:16%;">OOO 30 Sep–7 Oct</div>
+        </div>
+      </div>
+
+      <div class="grow" style="position:relative;">
+        <div class="callout-flag" style="top:6px; left:200px;">5</div>
+        <div class="client">
+          <div class="cname"><span class="clip">Nathan Dart</span><span class="builder-tag">aiden</span></div>
+          <div class="meta">Status Technology · Kickoff 30 Aug</div>
+        </div>
+        <div class="track">
+          <div class="bar scope" style="left:5%; width:10%;">Scope</div>
+          <div class="bar build" style="left:38%; width:16%;">Build</div>
+          <div class="bar refine" style="left:54%; width:20%;">Refinement</div>
+        </div>
+      </div>
+
+      <div class="grow" style="position:relative;">
+        <div class="client">
+          <div class="cname"><span class="clip">Maria Florou</span><span class="builder-tag">kenzo</span></div>
+          <div class="meta">Kickoff 7 Sept · Scope 28 Aug · SOW 2 Sept · Access 7 Sept</div>
+        </div>
+        <div class="track">
+          <div class="bar scope" style="left:22%; width:8%;">Scope</div>
+          <div class="bar prebuild" style="left:30%; width:8%;">Pre-Build</div>
+          <div class="bar build" style="left:42%; width:16%;">Build</div>
+          <div class="bar refine" style="left:58%; width:20%;">Refinement</div>
+        </div>
+      </div>
+
+      <div class="grow" style="position:relative;">
+        <div class="callout-flag" style="top:6px; left:200px;">6</div>
+        <div class="callout-flag" style="top:6px; left:230px;">7</div>
+        <div class="client">
+          <div class="cname"><span class="clip" title="Nicholas Bletsis">Nicholas Ble…</span><span class="builder-tag" style="color:var(--ink-faint)">?→ —</span></div>
+          <div class="meta">Discovery 27 Aug · Kickoff 21 Sept (tentative)</div>
+        </div>
+        <div class="track">
+          <div class="callout-flag" style="top:12px; left:48%;">8</div>
+          <div class="bar scope" style="left:28%; width:7%;">Scope</div>
+          <div class="bar tentative" style="left:55%; width:18%;">Tentative kickoff</div>
+        </div>
+      </div>
+
+      <div class="grow" style="position:relative;">
+        <div class="callout-flag" style="top:6px; right:8px;">9</div>
+        <div class="client">
+          <div class="cname"><span class="clip">Danielle Dwyer</span><span class="builder-tag" style="color:var(--ink-faint)">— unassigned</span></div>
+          <div class="meta">Kickoff 5 Oct · Scope 7 Sept · SOW 12 Sept · Access 1 Oct</div>
+        </div>
+        <div class="track">
+          <div class="bar scope" style="left:38%; width:8%;">Scope</div>
+          <div class="bar prebuild" style="left:46%; width:56%;">Pre-Build</div>
+          <div class="fade-edge"></div>
+        </div>
+      </div>
+
+      <div class="grow" style="position:relative;">
+        <div class="client">
+          <div class="cname"><span class="clip">+ New client</span></div>
+          <div class="meta" style="font-style:italic;">unplaced</div>
+        </div>
+        <div class="track">
+          <div class="bar capacity" style="left:70%; width:18%;">Open window</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Build Schedule — target design · companion to the visual audit and automation spec v2.7</footer>
+
+</div>

@@ -1,0 +1,850 @@
+<title>Build Schedule Automation</title>
+<style>
+  :root{
+    --bg:#F4F5F7;
+    --surface:#FFFFFF;
+    --surface-2:#EBEDF1;
+    --border:#DBDFE6;
+    --ink:#161A22;
+    --ink-muted:#5B6472;
+    --accent:#33477C;
+    --accent-soft:#E7EAF4;
+    --scope:#B4761F;
+    --scope-soft:#F6EADA;
+    --prebuild:#2E6FA7;
+    --prebuild-soft:#E2EEF6;
+    --build:#6B7A1E;
+    --build-soft:#EEF1DC;
+    --refine:#8C9A44;
+    --refine-soft:#F1F3E6;
+    --blocked:#9A3B3B;
+    --blocked-soft:#F6E4E1;
+    --suggested:#33477C;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161C;
+      --surface:#1B1E26;
+      --surface-2:#20232C;
+      --border:#30333E;
+      --ink:#EDEFF4;
+      --ink-muted:#9AA1B0;
+      --accent:#8DA0E0;
+      --accent-soft:#232B42;
+      --scope:#E0A857;
+      --scope-soft:#332912;
+      --prebuild:#7FB4E0;
+      --prebuild-soft:#152633;
+      --build:#B8C766;
+      --build-soft:#262A12;
+      --refine:#A9B879;
+      --refine-soft:#22240F;
+      --blocked:#E0888A;
+      --blocked-soft:#331616;
+      --suggested:#8DA0E0;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161C;
+    --surface:#1B1E26;
+    --surface-2:#20232C;
+    --border:#30333E;
+    --ink:#EDEFF4;
+    --ink-muted:#9AA1B0;
+    --accent:#8DA0E0;
+    --accent-soft:#232B42;
+    --scope:#E0A857;
+    --scope-soft:#332912;
+    --prebuild:#7FB4E0;
+    --prebuild-soft:#152633;
+    --build:#B8C766;
+    --build-soft:#262A12;
+    --refine:#A9B879;
+    --refine-soft:#22240F;
+    --blocked:#E0888A;
+    --blocked-soft:#331616;
+    --suggested:#8DA0E0;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:15px;
+    line-height:1.6;
+    padding-inline:16px;
+  }
+  a{color:var(--accent);}
+
+  .page{
+    max-width:920px;
+    margin:0 auto;
+    padding-block:40px 80px;
+  }
+
+  header.masthead{
+    padding-bottom:28px;
+    margin-bottom:36px;
+    border-bottom:1px solid var(--border);
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;
+    letter-spacing:0.09em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px;height:7px;
+    background:var(--accent);
+    display:inline-block;
+  }
+  h1{
+    font-family:"IBM Plex Serif",Georgia,serif;
+    font-weight:600;
+    font-size:clamp(28px,4.5vw,38px);
+    line-height:1.15;
+    margin:0 0 12px;
+    text-wrap:balance;
+  }
+  .dek{
+    font-size:16px;
+    color:var(--ink-muted);
+    max-width:62ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 22px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;
+    color:var(--ink-muted);
+  }
+  .meta strong{color:var(--ink);font-weight:600;}
+
+  section{margin-bottom:44px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  .section-num{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:2px 7px;
+    border-radius:4px;
+    flex:none;
+  }
+  h2{
+    font-family:"IBM Plex Serif",Georgia,serif;
+    font-size:21px;
+    font-weight:600;
+    margin:0;
+  }
+  h3{
+    font-family:"IBM Plex Sans",sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    margin:22px 0 8px;
+    color:var(--ink);
+  }
+  p{margin:0 0 12px;}
+  .lede{color:var(--ink-muted);}
+
+  ul,ol{margin:0 0 14px;padding-left:22px;}
+  li{margin-bottom:6px;}
+  li::marker{color:var(--ink-muted);}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+  }
+
+  .sources{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:12px;
+  }
+  @media (max-width:640px){ .sources{grid-template-columns:1fr;} }
+  .source{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 16px 14px;
+  }
+  .source .tag{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-muted);
+    margin-bottom:8px;
+    display:block;
+  }
+  .source h4{
+    margin:0 0 6px;
+    font-size:15px;
+    font-weight:600;
+  }
+  .source p{
+    font-size:13.5px;
+    color:var(--ink-muted);
+    margin:0;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  table caption{
+    caption-side:top;
+    text-align:left;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-muted);
+    margin-bottom:8px;
+  }
+  th,td{
+    text-align:left;
+    padding:9px 12px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  thead th{
+    background:var(--surface-2);
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-muted);
+    font-weight:600;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  td code, .stage-pill{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;
+  }
+  .table-wrap{overflow-x:auto;}
+
+  .stage-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:2px 8px;
+    border-radius:999px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .stage-pill::before{content:"";width:7px;height:7px;border-radius:2px;}
+  .pill-scope{background:var(--scope-soft);color:var(--scope);}
+  .pill-scope::before{background:var(--scope);}
+  .pill-prebuild{background:var(--prebuild-soft);color:var(--prebuild);}
+  .pill-prebuild::before{background:var(--prebuild);}
+  .pill-build{background:var(--build-soft);color:var(--build);}
+  .pill-build::before{background:var(--build);}
+  .pill-refine{background:var(--refine-soft);color:var(--refine);}
+  .pill-refine::before{background:var(--refine);}
+  .pill-blocked{background:var(--blocked-soft);color:var(--blocked);}
+  .pill-blocked::before{background:var(--blocked);}
+
+  .figure{
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    padding:18px 18px 14px;
+    margin:16px 0 8px;
+  }
+  .figure svg{width:100%;height:auto;display:block;}
+  .figure figcaption{
+    font-size:12.5px;
+    color:var(--ink-muted);
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--border);
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    font-size:12px;
+    color:var(--ink-muted);
+    margin-top:10px;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:10px;height:10px;border-radius:2px;display:inline-block;flex:none;}
+
+  .rule-block{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 18px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    line-height:1.7;
+    overflow-x:auto;
+    white-space:pre;
+  }
+  .rule-block .c{color:var(--ink-muted);}
+  .rule-block .k{color:var(--accent);}
+
+  .override-note{
+    display:flex;
+    gap:10px;
+    background:var(--accent-soft);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:13.5px;
+    margin-top:14px;
+  }
+  .override-note b{color:var(--accent);}
+
+  .open-q{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .open-q .q{
+    display:flex;
+    gap:12px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 14px;
+  }
+  .open-q .q .num{
+    font-family:"IBM Plex Mono",monospace;
+    color:var(--ink-muted);
+    font-size:12px;
+    flex:none;
+    padding-top:1px;
+  }
+  .open-q .q p{margin:0;font-size:13.5px;}
+  .open-q .q .who{
+    display:block;
+    font-size:11.5px;
+    color:var(--ink-muted);
+    margin-top:4px;
+    font-family:"IBM Plex Mono",monospace;
+  }
+
+  footer{
+    margin-top:56px;
+    padding-top:18px;
+    border-top:1px solid var(--border);
+    font-size:12px;
+    color:var(--ink-muted);
+    font-family:"IBM Plex Mono",monospace;
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Handoff spec · Build Schedule · v3.16</div>
+    <h1>Making the Build Schedule automatic</h1>
+    <p class="dek">Same Gantt view. What "free" means here got sharper: it isn't Jack's meeting calendar, it's whether he has room for another client — real time off, blended with how many <em>build-phase</em> bars he's already carrying (refinement doesn't count). Nothing here ever writes a new date on its own — it flags, a human decides.</p>
+    <div class="meta">
+      <span><strong>Scope</strong> Build Schedule view only</span>
+      <span><strong>Status</strong> Code-complete, QA-confirmed, live in production on <code>dojo-agents</code> — see section 11 for why "shipped" means live here despite the branch name</span>
+      <span><strong>Backend owner</strong> Zane</span>
+      <span><strong>Frontend owner</strong> Joaquin, with Cris</span>
+      <span><strong>Data/stage owner</strong> Polly</span>
+    </div>
+    <div class="override-note" style="margin-top:16px;">
+      <span>↳</span>
+      <p><b>Changed from v3.15:</b> section 10's Hover detail item is mocked, not just proposed — built into the final-layout reference file: hover or keyboard-focus any bar for phase, date range, and pinned/auto-derived status. Tooltip content there is placeholder, ready for real values at implementation. Section 10.</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-head"><span class="section-num">01</span><h2>What stays the same</h2></div>
+    <p>The view doesn't change shape. Rows are clients, columns are dates, each build is still four segments — scope call → SOW due, pre-build wait, the fixed 2-week build, then 4 weeks of refinement. What changes is <em>where the dates and states come from</em>: today someone types them in; after this, three feeds populate and update them, and a person still drags to adjust.</p>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">02</span><h2>Data sources</h2></div>
+    <p class="lede">Five now, not three — the biggest gap wasn't a missing feed, it was that only 5 of 20 client builds had a row to feed at all.</p>
+    <div class="sources">
+      <div class="source">
+        <span class="tag">Feed A</span>
+        <h4>GoHighLevel</h4>
+        <p>Post-Sales pipeline has five coarse stages only — Deposit Paid, Scoping, Building, Support, Closed. Confirms which phase a row is in; drives nothing granular.</p>
+      </div>
+      <div class="source">
+        <span class="tag">Feed B</span>
+        <h4>Build record (Builds page)</h4>
+        <p>The one live store — client/project record, discovery- and scope-call dates. Does <b>not</b> hold contract status or access-ready date; those fields don't exist yet. <b>Not</b> the sidebar's Client Pipeline page — that's a different, stale store. See the warning below.</p>
+      </div>
+      <div class="source">
+        <span class="tag">Feed C</span>
+        <h4>Jack's own calendar</h4>
+        <p>OOO / vacation only — not routine meetings, and not the shared Build Schedule calendar (that one's deliberately marked free so it can't block anything). A meeting on his calendar doesn't mean he can't take a client.</p>
+      </div>
+      <div class="source">
+        <span class="tag">Feed D</span>
+        <h4>Build pipeline load</h4>
+        <p>How many of the 20 client builds Jack is actively carrying right now. This, not calendar gaps, is the real answer to "can he take another client" — needs every build visible as a row first (section 06, step 2).</p>
+      </div>
+      <div class="source">
+        <span class="tag">Derived</span>
+        <h4>Capacity signal</h4>
+        <p>Blends Feed C (real time off) with Feed D (current workload). Flags open windows and clashes for <em>project</em> reasons — it never writes or proposes a specific date.</p>
+      </div>
+    </div>
+    <div class="override-note">
+      <span>↳</span>
+      <p><b>There are two client-list pages, and only one is real.</b> Same trap as the calendar in section 04. The <b>Builds</b> page renders the build record — the one live store, measured today at 28 records, all recently touched. The sidebar's <b>Client Pipeline</b> page is a separate store that stopped updating in May — 22 records, all last touched 20–24 May, still showing stages that are months stale. It will silently return plausible-looking data and be wrong. Feed B, and the auto-row-sync already shipped in section 06 step 2, must read Builds. Worth Zane confirming which store that sync actually points at, given the two look alike.</p>
+    </div>
+    <div class="override-note" style="border-left-color:var(--blocked);background:var(--blocked-soft);">
+      <span>↳</span>
+      <p><b>Shared Build Schedule calendar — exists, and is not a source of truth, in those words.</b> Jack shared a link to it and asked whether it could fill the gap; the answer is no, confirmed in code rather than assumed. <code>shared/build-schedule-gcal-sync.js</code> line 41 hard-codes this calendar's id as a write target — it calls <code>createEvent</code>, <code>updateEvent</code>, <code>deleteEvent</code> against it and never calls <code>listEvents</code> or <code>getEvent</code>. Write-only: a one-way mirror of the Build Schedule table already documented above as authoritative. Dates go table → calendar, never back. Jack created it 29 Aug and invited the whole team — it's the shared view everyone already has, not a store he's standing up. Two consequences worth carrying forward: an event typed directly into it by a human is read by nothing, and if it's attached to a schedule row that later gets deleted, the sync deletes the calendar event with it — so entering a date there doesn't contribute to a source of truth, it writes somewhere that can be silently overwritten. The capacity signal (Feed D → Derived, above) deliberately does <b>not</b> read this calendar for availability — it reads Feed C, Jack's real calendar — precisely so the system isn't reading its own bars back at itself.</p>
+      <p style="margin-top:8px"><b>Author confirmed, method worth keeping:</b> the sync is Zane's, per three commits on that file carrying his name in the agent trailer — including one titled "sync onto the shared team calendar, not Jack's personal one." The commit <em>author</em> field can't be used for this: every commit in this repo shows Jack William as author, all of them, so it doesn't discriminate between builders. The trailer does. Worth remembering next time authorship is in question here.</p>
+      <p style="margin-top:8px"><b>Correction, not an addition — there are no milestones on this calendar, by design.</b> An earlier pass here inferred "handles milestone events at some level" from a commit subject, not from reading the file; the truth is the opposite. Six milestone kinds — kickoff, build end, scope call, SOW due, access ready, handover — were removed entirely on 31 Aug, on Jack's own instruction: each sat on a day a phase bar already covered, so a milestone forced a second calendar row for information already shown, not new information. What the calendar actually renders is four phase bars per build and nothing else: <b>Scope call → SOW due</b>, <b>Pre-Build</b>, <b>Build</b> (or Build tentative — a wording variant, not a fifth bar), <b>Refinement</b>. Confirmed against the module directly, not recalled: it builds exactly <code>span_scope</code>, <code>span_pre_build</code>, <code>span_build</code>, <code>span_refinement</code>. Each bar exists only if the dates it needs are filled — a bar whose dates go missing is <b>deleted</b> from the calendar, not left blank or wrong, and deliberately so: the sync walks the union of what should exist against what previously existed, and removes anything no longer supported.</p>
+      <p style="margin-top:8px"><b>Why this outranks a wrong-date bug, not just why it's severe:</b> a wrong bar gets reported by whoever notices it looks off. A bar that silently stops existing is indistinguishable from a build that was simply never scheduled — on the one calendar view Jack invited the whole team to. Invisibility, not severity, is the reason this raises section 09's ownership gap rather than just adding to it.</p>
+      <p style="margin-top:8px"><b>The exposure is wider than one field.</b> Pre-Build needs <em>both</em> <code>sow_due_date</code> and <code>access_ready_date</code> — blank <code>access_ready_date</code> loses only Pre-Build, but blank <code>sow_due_date</code> loses Pre-Build <em>and</em> the Scope bar, since the two share it. So the single field with the most riding on it is <code>sow_due_date</code>, not the unowned one — worth weighing against section 09's ownership list, not a replacement for it.</p>
+      <p style="margin-top:8px"><b>A third, different failure mode, run rather than reasoned about, with a passing control on complete dates:</b> if <code>start_date</code> is set and <code>build_end_date</code> is blank, the date helper throws — and it throws <em>outside</em> the sync's per-event error handling, so the whole row's calendar sync aborts, including bars that were otherwise fine. Not a disappearance and not a wrong date: a build that should show three good bars can show none.</p>
+      <p style="margin-top:8px"><b>Unmeasured, and reported as unmeasured rather than as zero:</b> whether any live row is currently in that throwing state. The Build Schedule endpoint returns <code>Unauthorized</code> on this check, so an empty result here reflects a permissions wall, not an absence of the condition — no count either way, don't read a zero into it.</p>
+    </div>
+
+    <h3>Where the data actually comes from</h3>
+    <figure class="figure">
+      <svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Data flow diagram: Client Pipeline is a dead end, Builds/build record plus Jack's calendar, the signing store, and GHL feed the Build Schedule table, which drives the Gantt UI">
+        <g font-family="IBM Plex Sans, sans-serif" font-size="12.5">
+
+          <!-- Client Pipeline — dead end -->
+          <rect x="10" y="14" width="230" height="46" rx="6" fill="var(--blocked-soft)" stroke="var(--blocked)" stroke-width="1.5"/>
+          <text x="26" y="33" fill="var(--blocked)" font-weight="700">Client Pipeline</text>
+          <text x="26" y="49" fill="var(--blocked)" font-family="IBM Plex Mono, monospace" font-size="10.5">stale since May — never read</text>
+          <line x1="240" y1="37" x2="300" y2="37" stroke="var(--blocked)" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <text x="270" y="30" text-anchor="middle" fill="var(--blocked)" font-weight="700" font-size="15">✕</text>
+
+          <!-- Builds / build record — source of truth -->
+          <rect x="10" y="76" width="230" height="46" rx="6" fill="var(--build-soft)" stroke="var(--build)" stroke-width="1.5"/>
+          <text x="26" y="95" fill="var(--ink)" font-weight="700">Builds page / build record</text>
+          <text x="26" y="111" fill="var(--ink-muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">28 records, all recently touched</text>
+
+          <!-- Jack's calendar -->
+          <rect x="10" y="138" width="230" height="40" rx="6" fill="var(--surface-2)" stroke="var(--border)" stroke-width="1.5"/>
+          <text x="26" y="157" fill="var(--ink)" font-weight="600">Jack's calendar</text>
+          <text x="26" y="171" fill="var(--ink-muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">eventType — OOO/vacation only</text>
+
+          <!-- Signing store -->
+          <rect x="10" y="194" width="230" height="40" rx="6" fill="var(--surface-2)" stroke="var(--border)" stroke-width="1.5"/>
+          <text x="26" y="213" fill="var(--ink)" font-weight="600">Signing store</text>
+          <text x="26" y="227" fill="var(--ink-muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">joined via sow_id, read-only</text>
+
+          <!-- GHL — deferred -->
+          <rect x="10" y="250" width="230" height="40" rx="6" fill="var(--surface-2)" stroke="var(--border)" stroke-width="1.5" opacity="0.55"/>
+          <text x="26" y="269" fill="var(--ink-muted)" font-weight="600">GoHighLevel</text>
+          <text x="26" y="283" fill="var(--ink-muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">deferred — confirmation only</text>
+
+          <!-- convergence lines into Build Schedule table -->
+          <path d="M240,99 C320,99 320,150 400,150" fill="none" stroke="var(--build)" stroke-width="1.5"/>
+          <path d="M240,158 C320,158 320,150 400,150" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+          <path d="M240,214 C320,214 320,160 400,160" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+          <path d="M240,270 C320,270 320,170 400,170" fill="none" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+          <!-- Build Schedule table -->
+          <rect x="400" y="110" width="210" height="80" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="416" y="134" fill="var(--accent)" font-weight="700">Build Schedule table</text>
+          <text x="416" y="152" fill="var(--ink-muted)" font-family="IBM Plex Mono, monospace" font-size="10">per-field pin protects</text>
+          <text x="416" y="166" fill="var(--ink-muted)" font-family="IBM Plex Mono, monospace" font-size="10">manual drags from sync</text>
+          <text x="416" y="182" fill="var(--ink-muted)" font-family="IBM Plex Mono, monospace" font-size="10">20-of-20 rows, auto-created</text>
+
+          <!-- arrow to Gantt UI -->
+          <path d="M610,150 L680,150" fill="none" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="var(--accent)"/>
+            </marker>
+          </defs>
+
+          <!-- Gantt UI -->
+          <rect x="690" y="60" width="200" height="180" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+          <text x="706" y="84" fill="var(--ink)" font-weight="700">Gantt UI</text>
+          <line x1="706" y1="96" x2="874" y2="96" stroke="var(--border)"/>
+          <circle cx="712" cy="112" r="3" fill="var(--build)"/>
+          <text x="722" y="116" fill="var(--ink-muted)" font-size="11">Capacity tile</text>
+          <circle cx="712" cy="134" r="3" fill="var(--blocked)"/>
+          <text x="722" y="138" fill="var(--ink-muted)" font-size="11">OOO lane</text>
+          <circle cx="712" cy="156" r="3" fill="var(--accent)"/>
+          <text x="722" y="160" fill="var(--ink-muted)" font-size="11">Open window marker</text>
+          <circle cx="712" cy="178" r="3" fill="var(--refine)"/>
+          <text x="722" y="182" fill="var(--ink-muted)" font-size="11">Scope/build/refine bars</text>
+          <circle cx="712" cy="200" r="3" fill="var(--ink-muted)"/>
+          <text x="722" y="204" fill="var(--ink-muted)" font-size="11">lead_builder tag</text>
+          <circle cx="712" cy="222" r="3" fill="var(--ink-muted)"/>
+          <text x="722" y="226" fill="var(--ink-muted)" font-size="11">Awaiting-kickoff list</text>
+        </g>
+      </svg>
+      <figcaption>Client Pipeline never connects to anything — it's a dead end, not a source. Everything the schedule shows traces back to the build record, Jack's real calendar, or the signing store; GHL confirms phase only and stays deferred.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">03</span><h2>Stage automation</h2></div>
+    <p class="lede">Two stores, two different jobs: the <b>build record</b> is the source of truth for the <em>client</em>; the <b>Build Schedule table</b> is the source of truth for the <em>schedule</em>. 20 rows today, hand-entered or dragged — not read off the build record wholesale. Only two things cross from the build record into a row: the client's name, once linked, and the scope-call date, where one's been recorded (11 of 20 carry one). Everything else on the table lives there natively.</p>
+    <p class="lede" style="margin-top:-4px">The coloured bars themselves are <b>calculated, never stored</b>: build is a fixed 2 weeks, refinement follows for 4, scope call → SOW due is 5 days, and Pre-Build runs from SOW due to access-ready. A date that's pinned or dragged is marked manual and the system won't move it again; left untouched, it stays derived and recalculates off whatever's upstream.</p>
+    <div class="override-note">
+      <span>↳</span>
+      <p><b>Standing rule, not a per-field decision:</b> once a build-record field has a named writer and real data in it, it syncs onto the Build Schedule table automatically and the bar moves with it — nobody has to also update the Gantt by hand. That's already true for <code>scope_call_scheduled_at</code> and <code>lead_builder</code>. It becomes true for <code>access_ready_date</code> the moment someone is named to write it — that's the only blocker, not a separate design question each time a field gets added. Entering data at the source is what makes the schedule move; nothing else has to change for that to happen.</p>
+    </div>
+
+    <h3>What v1 actually wires</h3>
+    <p class="lede" style="margin-top:-4px">Real field names, measured against the 20 real client builds (28 rows total, 8 excluded as fixtures/templates/a duplicate) — not the guesses this spec started with. Two are safe to sync, one is actively dangerous, one doesn't exist in practice.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Build-record field → Build Schedule table</caption>
+        <thead>
+          <tr><th>Build-record field</th><th>Coverage</th><th>Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>scope_call_scheduled_at</code></td><td>11 of 20, real timestamps</td><td><span class="stage-pill pill-build">safe, with a guard</span> — 3 completed calls (Emma Cattell, Julio Rojas, Damian Burstow) have no date at all, populated going forward only. A blank here means "not recorded," never "no call happened" — don't let the sync say otherwise.</td></tr>
+          <tr><td><code>lead_builder</code></td><td>10 of 20 named, 9 blank, 1 literal <code>?</code></td><td><span class="stage-pill pill-build">safe, with a guard</span> — exactly one write path, locked down 4 Sept after any caller could quietly self-name as lead builder. It demands a named actor and a written reason, refuses contractors, and <b>refuses self-assignment</b> — a builder cannot make themselves the lead. What it doesn't do: say whose job it is to assign someone else. One row (Sof/Chris) literally contains <code>?</code>. Treat that value as null, or a builder named "?" ships.</td></tr>
+          <tr><td><code>sales_call_date</code> (the "discovery call" field)</td><td>7 of 20 on re-measure, free text</td><td><span class="stage-pill pill-blocked">do not sync — hint, not fact</span> — the build record holds it, but nobody writes it consistently. Only a fraction parse as a date at all; the rest are prose ("Sales call - Jun 12 (signed)"), and on Damian it holds a <em>scope</em> call, not a discovery call. Leave this segment human-set.</td></tr>
+          <tr><td><code>est_build_start</code></td><td>0 of 20 — field works, unused</td><td><span class="stage-pill pill-blocked">do not sync</span> — has a real writer (an editable cell on the build page); nobody's ever filled it in. Different problem from a missing writer, same result for v1: syncing empty everywhere would read as a finding when it's really just an unused field.</td></tr>
+          <tr><td><code>build_day</code></td><td>1 of 20</td><td><span class="stage-pill pill-blocked">do not sync — has a writer</span> — Miyagi confirmed a server-side writer via the standard build save (ran it, didn't just read for the field name — a code search for a name returns nothing here even on fields written daily, since the save path matches whatever's in the table at runtime rather than naming fields). Not populated because it's rarely used, not because nothing can write it. Sync would still misread "empty" as "no writer."</td></tr>
+          <tr><td><code>machine_expected_date</code></td><td>0 of 20</td><td><span class="stage-pill pill-blocked">do not sync — has a writer</span> — same confirmation, and two write paths, not one. Same caution as <code>build_day</code>: empty here means unused, not unwritable.</td></tr>
+          <tr><td>GHL coarse phase</td><td>—</td><td>deferred for v1 — see below</td></tr>
+          <tr><td><code>contract_status</code></td><td>doesn't exist as a column</td><td><span class="stage-pill pill-build">derive, don't store</span> — via <code>sow_id</code> → signing store on <code>token</code> (not <code>id</code>). <code>sow_id</code> populated on 6 of 20; the rest split into two distinct non-answers, not one. Detail below.</td></tr>
+          <tr><td><code>access_ready_date</code></td><td>doesn't exist on the build record at all</td><td><span class="stage-pill pill-blocked">authoritative only on the schedule</span> — no build-record field, but it does have two real writers on the Build Schedule table itself: the schedule dialog (manual entry) and a free-text "brain-dump" extractor that pulls dates out of prose via a model. If a date here looks odd, that extractor is the first thing to check.</td></tr>
+          <tr><td>Owning agent</td><td>doesn't exist as a field, anywhere</td><td><span class="stage-pill pill-blocked">no source of truth</span> — not unused, not unwritten — the field itself doesn't exist on the record.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="override-note">
+      <span>↳</span>
+      <p><b>What's actually shipped vs. what this table describes:</b> tonight's auto-row-sync (section 06, step 2) selects only <code>id</code>, <code>client_name</code>, <code>stage</code>, <code>tags</code>, <code>not_a_client</code> — it creates coverage rows, it doesn't read or sync any of the fields above yet. Step 3a is exactly the job of adding <code>scope_call_scheduled_at</code> and <code>lead_builder</code>, with their guards, on top of those rows.</p>
+    </div>
+
+    <h3>Deriving contract_status — five things that cost a day if missed</h3>
+    <p class="lede" style="margin-top:-4px">Two of these produce a confident <em>wrong</em> answer, not an error — worse than a crash, because nothing flags it.</p>
+    <ol>
+      <li><b>The join key changes name.</b> <code>build.sow_id</code> joins to the signing store's <code>token</code> column, not its <code>id</code>. Joining on <code>id</code> silently returns a 100% failure rate — every build DANGLING, every document orphaned. A round number like that is the tell, not a real result. Validate any join with a control pair: one known-good token, one invented one — it discriminates instantly.</li>
+      <li><b>The status vocabulary is exactly four values, nothing else:</b> <code>draft</code>, <code>sent</code>, <code>signed</code>, <code>voided</code>. Measured live across all 46 documents: draft 24, signed 10, voided 7, sent 5. Don't invent a fifth, and don't remap onto one that isn't there.</li>
+      <li><b>Three outcomes, not two.</b> <code>UNKNOWN</code> covers no <code>sow_id</code> at all (14 of 20). But a <code>sow_id</code> that points at no document is a different, distinct fact — <code>DANGLING</code>, currently one real case (Julio Rojas). "Nobody recorded a contract" and "the pointer is broken" must render as different states, or the one that's an actual bug hides inside the one that's expected.</li>
+      <li><b><code>template</code> can be null on a legitimately sent document.</b> Dan White's contract is a hand-typed override with no template recorded. Anything downstream that keys off template name will misread a real, valid contract as malformed.</li>
+      <li><b>Inverse checked, so it doesn't need re-checking:</b> 11 of 15 non-test signed/sent documents aren't reachable from any build record. Not a gap — 5 are payment/contract test fixtures, 6 are HR documents (contractor NDAs, letters of offer). No client contract is hiding outside the build records.</li>
+    </ol>
+    <div class="table-wrap">
+      <table>
+        <caption>Known-good spot check — the 6 builds with a <code>sow_id</code></caption>
+        <thead><tr><th>Client</th><th>Derived <code>contract_status</code></th></tr></thead>
+        <tbody>
+          <tr><td>Emma</td><td><code>sent</code></td></tr>
+          <tr><td>Nathan</td><td><code>signed</code></td></tr>
+          <tr><td>Dan White</td><td><code>sent</code></td></tr>
+          <tr><td>Angelina</td><td><code>draft</code></td></tr>
+          <tr><td>Damian</td><td><code>signed</code></td></tr>
+          <tr><td>Julio</td><td><code>DANGLING</code> — sow_id set, no matching document. Polly's fixing this one directly.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-muted)">A working join is ~10 lines; Polly already has one and can hand it over rather than have it re-derived from this description.</p>
+
+    <h3>Coarse phase — sourced from GHL Post-Sales</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>GHL stage → what it confirms (nothing more)</caption>
+        <thead>
+          <tr><th>GHL Post-Sales stage</th><th>Confirms</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Deposit Paid</code></td><td>Row is live in the system — doesn't move the bar</td></tr>
+          <tr><td><code>Scoping</code></td><td>Row belongs in the scope→SOW phase</td></tr>
+          <tr><td><code>Building</code></td><td>Row belongs in the pre-build/build phase</td></tr>
+          <tr><td><code>Support</code></td><td>Row belongs in refinement / post-build</td></tr>
+          <tr><td><code>Closed</code></td><td>Build archives off the active Gantt</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="override-note">
+      <span>↳</span>
+      <p><b>Every auto-set date is still draggable.</b> Automation sets the initial position; the existing "tentative / drag to move" interaction is unchanged. Nothing moves a bar that's been manually pinned — see the sequencing note in section 06 before this ships.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">04</span><h2>Showing when Jack is blocked</h2></div>
+    <p class="lede">No calendar page, and no reading of routine meetings — a call on Jack's calendar doesn't stop him running a build. Two calendars exist and only one is right for this: the shared Build Schedule calendar he created is deliberately marked free on every event so our own bars never look like a real booking; his own personal calendar is where OOO/vacation actually lives. Read the wrong one and this silently shows nothing, and looks correct doing it. Real OOO/vacation time renders as a shaded lane behind the existing rows, on the same date axis already on screen — so a conflict is visible exactly where it matters: against the bars it affects.</p>
+    <figure class="figure">
+      <svg viewBox="0 0 860 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gantt row showing a build bar, a Jack OOO block overlapping it, and an open-window marker for an unplaced client">
+        <!-- date grid -->
+        <g stroke="var(--border)" stroke-width="1">
+          <line x1="150" y1="14" x2="150" y2="196"/>
+          <line x1="290" y1="14" x2="290" y2="196"/>
+          <line x1="430" y1="14" x2="430" y2="196"/>
+          <line x1="570" y1="14" x2="570" y2="196"/>
+          <line x1="710" y1="14" x2="710" y2="196"/>
+          <line x1="850" y1="14" x2="850" y2="196"/>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-muted)">
+          <text x="150" y="12">21 Sep</text>
+          <text x="290" y="12">28 Sep</text>
+          <text x="430" y="12">5 Oct</text>
+          <text x="570" y="12">12 Oct</text>
+          <text x="710" y="12">19 Oct</text>
+        </g>
+
+        <!-- Jack OOO lane -->
+        <rect x="10" y="26" width="840" height="18" fill="var(--surface-2)"/>
+        <text x="14" y="39" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-muted)">JACK</text>
+        <rect x="360" y="26" width="140" height="18" fill="var(--blocked-soft)"/>
+        <rect x="360" y="26" width="140" height="18" fill="none" stroke="var(--blocked)" stroke-width="1" stroke-dasharray="3 2"/>
+        <text x="368" y="39" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--blocked)">OOO — vacation 30 Sep–7 Oct</text>
+
+        <!-- existing client: Danielle Dwyer, build overlaps OOO -->
+        <text x="10" y="70" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="var(--ink)">Danielle Dwyer</text>
+        <rect x="150" y="78" width="120" height="20" fill="var(--prebuild)"/>
+        <rect x="270" y="78" width="200" height="20" fill="var(--build)"/>
+        <rect x="470" y="78" width="240" height="20" fill="var(--refine)"/>
+        <!-- conflict marker -->
+        <g>
+          <circle cx="380" cy="78" r="7" fill="var(--blocked)"/>
+          <text x="380" y="82" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700" fill="var(--surface)">!</text>
+        </g>
+        <text x="270" y="112" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--blocked)">build window overlaps Jack's OOO — flagged, no date proposed</text>
+
+        <!-- open window, flagged only — not a proposed date -->
+        <text x="10" y="150" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="var(--ink-muted)" font-style="italic">+ New client</text>
+        <rect x="500" y="158" width="200" height="20" rx="3" fill="var(--accent-soft)"/>
+        <text x="510" y="172" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--accent)">window open from 12 Oct — flagged, not a proposed date</text>
+      </svg>
+      <div class="legend">
+        <span><i style="background:var(--prebuild)"></i>Pre-build</span>
+        <span><i style="background:var(--build)"></i>Build (fixed 2wk)</span>
+        <span><i style="background:var(--refine)"></i>Refinement</span>
+        <span><i style="background:var(--blocked)"></i>Jack OOO / blocked</span>
+        <span><i style="background:var(--accent-soft)"></i>Open window (flag only)</span>
+      </div>
+      <figcaption>New states only: the OOO lane (row 1), the overlap marker on an existing build, and the flat open-window marker for an unplaced client — no outline, no drag handle, because it isn't an offer to accept. Everything else in this mock is today's Build Schedule.</figcaption>
+    </figure>
+    <div class="override-note">
+      <span>↳</span>
+      <p><b>Confirmed live:</b> Google Calendar's API exposes <code>eventType</code> directly, checked against Jack's real calendar tonight — so OOO/vacation is read off that field natively. No keyword-matching against event titles, and no ambiguity about whether an ordinary meeting counts: it structurally can't.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">05</span><h2>Capacity signal — flag only, never a proposed date</h2></div>
+    <p class="lede">This is about projects, not Jack's diary. Moving a kickoff is a commercial act, not something a view does on its own — so this reports open windows, it never writes one in as an answer. "Full" is confirmed as of tonight's ruling: <b>2 concurrent build phases</b>, and refinement doesn't count toward it — Polly measured 3 refinements running at once with nobody treating the board as blocked, so a bar in refinement is background noise to this check, not a conflict.</p>
+    <div class="rule-block"><span class="c">// pseudocode, not literal API — output is informational only</span>
+<span class="k">for</span> day <span class="k">in</span> today...horizon(16 weeks):
+  window = [day, day + 2 weeks]              <span class="c">// fixed build length</span>
+  concurrent = count of other builds whose <span class="c">BUILD phase only</span>
+               (not refinement) overlaps window
+  <span class="k">if</span> concurrent &gt;= capacity_threshold:          <span class="c">continue  // default 2, configurable — Feed D</span>
+  <span class="k">if</span> window overlaps Jack's real OOO/vacation (Feed C):  <span class="c">continue</span>
+  <span class="k">if</span> day &lt; earliest_ready(client):              <span class="c">continue</span>
+                                               <span class="c">// scope call + SOW + access lead time</span>
+  <span class="k">yield</span> window  <span class="c">to the open-window list — never auto-applied to a bar</span></div>
+    <p style="margin-top:12px;font-size:13.5px;color:var(--ink-muted)">If no client is yet linked, this just reports the next N open windows against Feeds A–D so sales can quote a realistic kickoff date on the scope call — this is the "clear indicator / forecast" piece: capacity becomes visible before anyone commits to a date. A person still types the date into the Build Schedule table by hand; the signal never fills it in. <code>capacity_threshold</code> is a stored setting defaulting to 2, not a hardcoded number — it needs to move without a code change if the real limit turns out to be different.</p>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">06</span><h2>Build order — this sequencing is load-bearing</h2></div>
+    <div class="override-note" style="border-left-color:var(--blocked);background:var(--blocked-soft);">
+      <span>↳</span>
+      <p><b>Resolved — false alarm, backend confirmed genuinely shipped.</b> The whole verification chain tonight — Joaquin's local clone, the fresh <code>git fetch --all --prune</code>, the direct GitHub API check, Kenzo's independent repeat — was checking <code>dojo-agents/dashboard</code>, the Next.js repo. The actual Build Schedule backend logic (<code>build-schedule-db.js</code>) lives in a separate repo, <code>dojo-agents/shared/orchestrator/lib</code>. Checked there directly: both <code>aba475c9</code> and <code>7827e555</code> are real, with commit bodies matching Zane's description exactly — <code>syncScopeCallDates</code>, <code>lead_builder</code> passthrough, <code>field_source</code> provenance, all present. Nobody misreported anything; Joaquin was checking the wrong repo, and Kenzo's independent check repeated the same wrong target rather than surfacing a second failure mode. Backend stands as originally reported. Frontend is unblocked for real.</p>
+    </div>
+    <p class="lede">The two hardest prerequisites are already substrate as of tonight, ahead of schedule — the remaining steps build on top of them.</p>
+    <ol>
+      <li><span class="stage-pill pill-build">✓ shipped, confirmed in the correct repo — pending restart</span> <b>Per-field override pin on the Build Schedule table</b> — not the build record; that's where drag actually writes. Three dates are pinnable: start/kickoff, scope call, access-ready. Pinned, a date is marked manual and never recalculated; untouched, it stays derived and recalculates. Not one pin per row — one per field, with who-released-it tracked so "released" and "never set" don't look identical later.</li>
+      <li><span class="stage-pill pill-build">✓ shipped, confirmed in the correct repo — pending restart</span> <b>Every client build already gets a Build Schedule row automatically</b> — a <b>denylist</b>, not a list of stages to include. Covers every build except stages meaning not-real-yet (<code>lead</code>) or already finished (<code>live</code>, <code>done</code>, <code>complete</code>, <code>support</code>, <code>signed</code>). An earlier allowlist draft silently omitted <code>scope_phase_1</code> — a real stage — which would have dropped a real client off Jack's board with nothing turning red. Verified against all 28 live builds: identical 20-of-20 eligible set before and after, so this only adds resilience to future stages, no regression. The rule lives in the code as a rule, not an enumerated list — a list breaks silently the day someone adds a stage.</li>
+      <li><span class="stage-pill pill-build">✓ shipped, confirmed in the correct repo — pending restart</span> <b>3a.</b> <code>scope_call_scheduled_at</code> syncs from real builds data, respecting the manual-pin guard — tested directly: pinned a row to a deliberately wrong date, reran the sync, pin held. Real run updated 7 of 20 rows. <code>lead_builder</code> is read-only passthrough, no new column, <code>?</code> guarded to null. Commit <code>aba475c9</code>, confirmed in <code>dojo-agents/shared/orchestrator/lib</code>.</li>
+      <li><span class="stage-pill pill-prebuild">ruled, join validated, waiting on Polly's join</span> <b>3c.</b> Derive <code>contract_status</code> — don't create a column. Five things measured tonight that would otherwise cost a day, two of them the kind that produce a confident wrong answer rather than an error. Full detail below the table. Hold until Polly hands over her working join — no reason to build it twice.</li>
+      <li><span class="stage-pill pill-scope">not yet — no field on the build record</span> <b>access_ready_date</b> stays out of scope for the sync. It's not the same failure mode as the others — <code>build_day</code> and <code>machine_expected_date</code> both have server-side writers (confirmed by running the save path, not reading for a field name — see section 03's correction), and <code>est_build_start</code> has a working writer nobody's used. <code>access_ready_date</code> is different: no field on the build record at all, so there's nothing there to sync from. Revisits only once someone names the person or moment that observes access being ready, and which surface records it.</li>
+      <li><span class="stage-pill pill-refine">deferred — not required for v1</span> <b>3b.</b> Wire GHL coarse phase onto the rows. It's confirmation-only — no date, bar position, or downstream step in this spec reads it. Waiting on Carlo's sign-off on the full set of five stage IDs isn't worth gating "done" for: ship v1 without it, add the phase badge once he's signed off. Nothing else in this list depends on it either way.</li>
+      <li><span class="stage-pill pill-build">✓ shipped, confirmed in the correct repo — pending restart</span> Jack's real OOO/vacation lane from section 04 — his own calendar via <code>eventType</code>, confirmed live. Checked the empty result isn't a broken filter: 150 real events in the next 120 days, zero flagged <code>outOfOffice</code> — a true negative, not silence from reading the wrong field.</li>
+      <li><span class="stage-pill pill-build">✓ shipped, confirmed in the correct repo — pending restart</span> Build-pipeline load signal (Feed D), phase-aware per section 05 — concurrent build-phase counting, 2 = full, refinement excluded, matching the ruling. <code>capacity_threshold</code> is a real stored setting (<code>db/165</code>), editable without a deploy.</li>
+      <li><span class="stage-pill pill-build">✓ shipped, confirmed in the correct repo — pending restart</span> Capacity signal from section 05 — open windows and OOO conflicts, flag-only, never writes or proposes a date. Commit <code>7827e555</code>, confirmed alongside 3a/4/5 in <code>dojo-agents/shared/orchestrator/lib</code>.</li>
+      <li><span class="stage-pill pill-build">✓ shipped — QA confirmed live, commit <code>cac45083</code> closed</span> <b>Frontend.</b> OOO lane, capacity tile, and <code>lead_builder</code> badge, click-tested by Zane with screenshots and a standalone logic run — not just a read. Capacity tile confirmed with real numbers on screen (full at 2 concurrent builds, next open window 21 Sept–4 Oct, no OOO logged). The falsy-body fix run against all 6 real response shapes (healthy, network failure, 500, null body, string body, a rejecting <code>.json()</code>) — every one lands on a real terminal state, none stuck. <code>lead_builder</code> badges live on real bars (Nathan Dart, Maria Florou). OOO lane's guard logic confirmed correct; Jack genuinely has zero OOO events in the visible window right now, so it renders a true negative rather than a screenshot of a populated lane — Zane asked whether to write a fake event onto Jack's real calendar to force one, and was told not to: the logic was already verified, and fabricating data on a live calendar for a screenshot wasn't worth it.</li>
+    </ol>
+    <p style="font-size:13.5px;color:var(--ink-muted)">Everything marked shipped tonight needs the same batched restart to actually serve real API responses — not a separate ask, same queue as the rest of tonight's work. Backend owner: Zane, who built and verified it live. Data/stage owner: Polly.</p>
+    <div class="override-note">
+      <span>↳</span>
+      <p><b>Gate before the frontend ships, regardless of who builds it:</b> <code>lead_builder</code> is populated on 10 of 20 builds, blank on 9, and literally <code>"?"</code> on one. <code>"?"</code> must render as null, not a builder named "?" — already decided. What's still undecided: what an unassigned (blank) build does to any per-builder capacity view. This is exactly why v1's capacity signal (section 05) stays Jack-only rather than builder-aware — decide this explicitly before shipping anything that breaks capacity out by builder, not after someone plans off a number that's silently undercounting by up to 9.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">07</span><h2>New states this adds to the bar</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>State</th><th>Trigger</th><th>Rendering</th></tr></thead>
+        <tbody>
+          <tr><td>Open window</td><td>Capacity signal finds an opening for an unplaced client</td><td>Flat tinted marker, no outline, not draggable — informational, never an offer to accept</td></tr>
+          <tr><td>OOO conflict</td><td>A committed build overlaps Jack's real OOO/vacation window (not a meeting)</td><td>Small warning marker on the bar + one-line note beneath the row. Flag only — it never proposes a replacement date</td></tr>
+          <tr><td>Override pin</td><td>A person manually drags a segment</td><td>That field stops following the sync until cleared, recording who released it. Lives on the Build Schedule table, per-field — section 06</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">08</span><h2>Where responsibility sits today</h2></div>
+    <p class="lede">This was the other half of the original ask — who's actually in here. Jack owns scoping end to end, right up to the handover point. Past that point, sequencing, who's building what, chasing, tracking, and cadence come to whoever owns delivery — and stop going to Jack. One thing doesn't move: anything leaving the system to a client or third party still goes to Jack first, regardless of build stage.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Current split, by build record</caption>
+        <thead><tr><th>Stage</th><th>Owner</th><th>Clients</th></tr></thead>
+        <tbody>
+          <tr><td>Scoping (pre-handover)</td><td><span class="stage-pill pill-scope">Jack</span></td><td>Jess, Belinda, Emma, Maria, Ben (SEVEN82MOTORS), Danielle, Liuba, Dan White, Nicholas, Angelina</td></tr>
+          <tr><td>Foundations / onboarding / handover / live refinements</td><td><span class="stage-pill pill-build">Delivery</span></td><td>Nathan (foundations); Peter, Dylan, Kirstie (onboarding); Sof, Chris, Helen (handover); Lance, Morgan, Julio, Damian (live refinements)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-muted);margin-top:12px">This split is exactly what section 03's stage automation should reflect once it's live — a build crossing the handover line is the same event that should flip its row from Jack's view to delivery's.</p>
+
+    <h3>Who actually types it in</h3>
+    <p class="lede">Every field on the build record is hand-entered today, and it splits cleanly by stage — worth knowing before trusting any one field's freshness.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Build-record entry, by stage</caption>
+        <thead><tr><th>Stage</th><th>Entered by</th></tr></thead>
+        <tbody>
+          <tr><td>Scoping &amp; contract — creating the build record, the SoW</td><td>Polly (9 of 16 tracked creations), Zane, Miyagi</td></tr>
+          <tr><td>Build progress, once underway</td><td>The master builders — Kenzo and whoever's assigned. Jack's August ruling: they own build-page updates, Polly audits, doesn't type</td></tr>
+          <tr><td>Portal phase — the client-facing stage</td><td>Whoever's running the client relationship; tracked separately from internal stage</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-muted);margin-top:12px">Two automated creation paths exist — a paid Stripe deposit, a portal signup attached to a GHL contact — but neither has produced a real build yet; every build on record was created by an agent, by hand. That's a deeper gap than this spec covers: this spec automates the <em>schedule</em> once a build exists, not the <em>creation</em> of the build record itself. Worth flagging as the next real target once this ships.</p>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">09</span><h2>Open questions</h2></div>
+    <p class="lede">Eleven resolved, three still open — none block v1.</p>
+    <div class="open-q">
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Which GHL pipeline is authoritative for stage names — confirm the exact stage IDs before mapping.</s> Resolved: Post-Sales, five stages, listed in section 03.</p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Does a conflict get flagged only, or does the system propose a shifted date?</s> Resolved: flag only, never a proposed date — section 05.</p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Does the capacity signal need to account for anyone besides Jack?</s> Resolved for v1: Jack only. Builder is recorded on 10 of 20 client builds, blank on 9, a literal "?" on one — a builder-aware key would be blind on half the board on day one.</p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Calendar source for Jack.</s> Resolved and confirmed live tonight: his own Google Calendar's <code>eventType</code> field, checked against his real calendar — OOO/vacation only, not the shared Build Schedule calendar (marked free by design) and not routine meetings. Section 04.</p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Should v1 create a Build Schedule row automatically for every client build, or stay at the 5 hand-made rows?</s> Resolved and shipped tonight, pending restart: yes, every client build gets a row automatically. Section 06, step 2.</p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s><code>capacity_threshold</code> — how many concurrent builds count as "Jack is full"?</s> Resolved: 2 concurrent build phases, refinement doesn't count toward it (Polly measured 3 refinements running at once with the board reading as open). Stored as a configurable setting, not hardcoded. Section 05.</p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Which stage triggers auto-row-creation for a client build?</s> Resolved and shipped as commit <code>7e5910ac</code> — deliberately not a stage list. It's a denylist: every build is covered except stages meaning not-real-yet (<code>lead</code>) or already finished (<code>live</code>, <code>done</code>, <code>complete</code>, <code>support</code>, <code>signed</code>). Caught an earlier allowlist draft omitting a real stage (<code>scope_phase_1</code>) that would have silently dropped a client. Verified against all 28 live builds, no regression. Section 06, step 2.</p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Adding contract-status and access-ready fields to the build record?</s> Resolved, split: <code>contract_status</code> derives from <code>sow_id</code> → the signing store rather than becoming its own column (a hand-maintained mirror goes stale); renders <code>UNKNOWN</code> on the 14 of 20 builds missing a <code>sow_id</code>, never a defaulted guess. <code>access_ready_date</code> stays out of scope — not for the same reason as <code>est_build_start</code>/<code>mac_mini_expected_date</code>/<code>build_day</code> (those have writers, just underused) but because it has no field on the build record at all; this one only gets added once someone names the writer, the moment, and whether the field should exist there in the first place. Section 03, section 06 step 3c.</p>
+      </div>
+      <div class="q">
+        <span class="num">01</span>
+        <p>Not a v1 blocker — GHL coarse phase is deferred (section 06, step 3b) since nothing in this spec reads it. Still worth closing out: only 2 of the 5 stage IDs (pipeline, <code>Scoping</code>) have independent corroboration, and Carlo needs to sign off on the full set of five before the phase badge ships as a later addition.<span class="who">for: Carlo, on his own timeline</span></p>
+      </div>
+      <div class="q">
+        <span class="num">02</span>
+        <p>Not a v1 blocker, doesn't touch this spec's logic. Polly named and checked all four: <b>Lance Vale, Helen Nguyen, Sof and Chris, and Morgan Nelson</b> — the other clients at this stage do have contract records. None of the four has any document in Sequoya Sign, so it's absence, not an unlinked record. That's consistent with a legacy direct deal predating the SoW process, but <b>not proof of it</b> — she's searched one store only; contracts from before Sequoya Sign live as signed PDFs in Drive, unsearched. Recorded here as <b>absent from Sequoya Sign, Drive not yet searched</b> — not as "legacy confirmed."<span class="who">for: Polly, in her own lane</span></p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s><code>machine_expected_date</code> and <code>build_day</code> — do they have writers?</s> Resolved, and the opposite of what was expected: Miyagi confirmed both have server-side writers — he ran the save path rather than searching for the field name, since a name search returns nothing for any field on that table, written or not. A code read isn't a negative result; it's a bound on the search, not the world. Still open: capability was never the gap, so it's now a question of who <em>owns</em> filling these in — Polly bringing a shortlist for that.<span class="who">for: Polly to bring the shortlist, Cris to decide</span></p>
+      </div>
+      <div class="q">
+        <span class="num">03</span>
+        <p><b>Proposed, not established — awaiting Cris's confirmation.</b> Polly's ruling: <b>tool-owner is not field-owner</b> — the right owner is whoever is present the moment a fact becomes true, with somewhere to type it, not whoever owns a channel the fact might travel through. Walked field by field: <code>scope_call_date</code> → Polly (true when the call's booked, her lane). <code>est_build_start</code>/<code>build_day</code> → Cris/delivery (true once scheduled, post-scope). <code>access_ready_date</code> → the builder (only they can see it's real) — still has nowhere to live on the client record. <code>machine_expected_date</code> → often nobody internal; frequently client-side (Peter's own supplier), and when Maya relays a client-given date via WhatsApp/email that's her hearing a fact, not owning the field. Corrected in the same pass: GHL and the pipelines are Carlo's, ruled by Jack — not Maya's, a misattribution that's traveled before under a different name. Maya's actual lane is the client relationship, WhatsApp, and Gmail.</p>
+        <p style="margin-top:8px"><b><code>lead_builder</code> — read from code, not recalled:</b> exactly one write path exists, locked down 4 Sept after any caller could self-name as lead builder. It demands a named actor and a written reason, refuses contractors, and structurally refuses self-assignment — the system enforces that the act is attributed, but not whose act it should be. Polly's recommendation, hers to suggest not decide: Cris. The moment it becomes true — build assigned — is post-scope, inside delivery; the only other candidate is Jack, which reintroduces exactly the bottleneck he's been trying to remove. Backlog if accepted: corrected from an initial mismeasure of 14 down to <b>9</b> blank builds (10 of 20 already named, 1 literal <code>?</code>) — tidying up an existing majority habit, not starting one.</p>
+        <p style="margin-top:8px"><b>Scope correction, so this doesn't read wider than it is:</b> "no owner" applies to three fields, not to the build schedule as a whole. The calendar has a writer and it isn't a person — Zane's sync writes it automatically from the table, nothing there to name. The schedule table itself has working human writers already — the schedule dialog and the brain-dump extractor (section 03, <code>access_ready_date</code> row) — people use both today. What actually has no named owner is <code>machine_expected_date</code>, <code>build_day</code>, and <code>access_ready_date</code>: each can be written, and nobody is named as the person who does it or the moment it becomes true. Same shape as <code>lead_builder</code>, and the real finding here — not "the schedule has no owner."</p>
+        <span class="who">for: Cris to confirm or amend</span>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Milestones — partly built, not fully defined.</s> Resolved, and corrected before it shipped: there are no milestones, by design. Six kinds — kickoff, build end, scope call, SOW due, access ready, handover — were removed entirely on 31 Aug on Jack's own instruction, each having sat on a day a phase bar already covered. The calendar renders four phase bars only: Scope call → SOW due, Pre-Build, Build/Build tentative, Refinement — no milestone moments to declare, nobody to name for declaring one. See section 02 for what a blank <code>access_ready_date</code> or <code>start_date</code> does to those bars, which is worse than a wrong date.</p>
+      </div>
+      <div class="q">
+        <span class="num">✓</span>
+        <p><s>Live exposure count for the row-abort bug — unmeasured, not zero.</s> Resolved: Polly got past the permissions wall and measured it directly — <b>zero</b> of the 20 live builds are currently in the throwing state (<code>start_date</code> set, <code>build_end_date</code> blank). Only 4 of 20 rows carry dates at all right now, which is most of why the count is zero rather than a sign the defect is unlikely to matter later. The defect itself stays open in section 02 — a live count of zero today doesn't make the code path safe, it means nothing has hit it yet. No longer needs Zane or Miyagi.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">10</span><h2>Next iteration</h2></div>
+    <p class="lede">v1 is shipped. These are the next asks, not a reopening of anything above — two are ready to build, one is a bug still being scoped, one is a timeline marker.</p>
+
+    <div class="finding" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px;">
+      <b>Progress-days indicator.</b> Show how far into its current phase a build actually is — e.g. "Day 6 of 14" — not just the bar's position on the date axis. Reads off the same fields already synced (kickoff date, phase boundaries); no new data source needed, this is a rendering addition on top of section 03's fields.
+    </div>
+
+    <div class="finding" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px;">
+      <span class="stage-pill pill-build" style="margin-bottom:8px;display:inline-block;">✓ mocked, ready for Joaquin to build against</span>
+      <b>Hover detail.</b> Hovering a bar surfaces its full detail — status, dates, builder — without needing to open the row. Styled restrained and minimal: no heavy shadow or motion, a clean typographic panel that appears and dismisses without ceremony. This is additive to section 07's states, not a replacement for the always-visible row metadata. Built into the final-layout reference (hover or keyboard-focus any bar); tooltip content there is placeholder, not pulled from live data — swap in real values at implementation.
+    </div>
+
+    <div class="finding" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px;">
+      <b>Resolved, not a bug — explained by how dates derive.</b> The "inaccurate end dates" report traces to two real, expected behaviors, not a source-of-truth reading error: (1) bars are <em>calculated</em> from upstream dates (section 03) — a blank or wrong scope-call date cascades into a wrong SOW-due, Pre-Build, and Build position, correctly, off bad input; (2) <code>access_ready_date</code> has no writer and no build-record field at all, so the Pre-Build bar is only ever as accurate as whatever a human typed directly onto the Build Schedule table. Neither is a bug to fix in the sync — the real fix, if any, is making sure a blank upstream date renders its downstream bars as blank too, rather than silently computing a position off nothing. Worth a follow-up check specifically on that rendering behavior, not a data-pipeline investigation.
+    </div>
+
+    <div class="finding" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+      <b>Timeline marker, not a task:</b> the broader Build Pipeline — not just this Build Schedule view — is the next couple of weeks' target for full automation. Out of scope for this spec as written; noted here so it isn't lost between now and whenever that work starts.
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">11</span><h2>Where the code actually lives</h2></div>
+    <p class="lede">Two repos, two different GitHub orgs — the thing that caused tonight's whole false-alarm chase in section 06 was looking in the wrong one of these two. Worth having the map in one place.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Repo → what lives there</caption>
+        <thead><tr><th>Repo</th><th>What's in it</th><th>Branch</th></tr></thead>
+        <tbody>
+          <tr><td><code>built-by-dojo/dojo-dashboard</code></td><td>Everything visual — the tab itself is <code>components/clients/BuildScheduleTab.tsx</code>: bars, drag, dialog, legend.</td><td><code>main</code></td></tr>
+          <tr><td><code>creative-club/dojo-agents</code></td><td>Data and rules — six <code>/api/build-schedule</code> routes in <code>shared/orchestrator/server.js</code>, table logic in <code>shared/orchestrator/lib/build-schedule-db.js</code>, the capacity banner in <code>shared/build-schedule-capacity.js</code>, the Google Calendar sync in <code>shared/build-schedule-gcal-sync.js</code>, schema changes as numbered files in <code>shared/orchestrator/db</code>.</td><td><code>feat/byt</code> — this is what's live, see below</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-muted)">Quick test for which repo a change belongs in: if you can <em>see</em> it, it's the dashboard. If it's a date, a rule, a calculation, or which fields exist, it's dojo-agents — provenance, the pin, the 2-week/4-week windows, the capacity number, all of it.</p>
+    <div class="override-note">
+      <span>↳</span>
+      <p><b>Resolved, and reversed — "shipped ≠ live until merge" was wrong for <code>dojo-agents</code>, right for the dashboard.</b> Earlier drafts of this section treated the unmerged branch as a global gate; it isn't, and Polly proved it rather than argued it. <code>dojo-agents</code> runs from the <code>feat/byt</code> working tree directly — <code>main</code> is 4,767 commits behind, last touched 17 August, and isn't what's serving anything. She confirmed it by accident: editing a contract template on <code>feat/byt</code> rendered the change into a real client document within minutes, and that document records the <code>feat/byt</code> path as its source. For this repo, code-complete on that branch <em>is</em> live — nothing in section 06 is waiting on a merge. The rule is per-repository, not global: <code>dojo-dashboard</code> is a separate repo and genuinely is on <code>main</code>, so a real merge question can still exist there — just not the one this section used to describe for <code>dojo-agents</code>.</p>
+      <p style="margin-top:8px"><b>Worth flagging on its own, separate from this spec's logic:</b> a branch named <code>feat/byt</code> being what actually serves production, while <code>main</code> sits a month and 4,767 commits stale, is a naming/process risk independent of anything documented here — anyone reading "main" as the source of truth for <code>dojo-agents</code> will be wrong. Not this spec's problem to fix, but worth someone owning outside of it.</p>
+    </div>
+  </section>
+
+  <footer>Build Schedule automation — handoff spec · v3.16, ownership proposed</footer>
+
+</div>

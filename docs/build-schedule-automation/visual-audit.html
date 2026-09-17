@@ -1,0 +1,190 @@
+<title>Build Schedule Visual Audit</title>
+<style>
+  :root{
+    --bg:#F4F5F7;
+    --surface:#FFFFFF;
+    --surface-2:#EBEDF1;
+    --border:#DBDFE6;
+    --ink:#161A22;
+    --ink-muted:#5B6472;
+    --accent:#33477C;
+    --accent-soft:#E7EAF4;
+    --scope:#B4761F;
+    --scope-soft:#F6EADA;
+    --prebuild:#2E6FA7;
+    --prebuild-soft:#E2EEF6;
+    --build:#6B7A1E;
+    --build-soft:#EEF1DC;
+    --refine:#8C9A44;
+    --refine-soft:#F1F3E6;
+    --bad:#9A3B3B;
+    --bad-soft:#F6E4E1;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161C; --surface:#1B1E26; --surface-2:#20232C; --border:#30333E;
+      --ink:#EDEFF4; --ink-muted:#9AA1B0; --accent:#8DA0E0; --accent-soft:#232B42;
+      --scope:#E0A857; --scope-soft:#332912; --prebuild:#7FB4E0; --prebuild-soft:#152633;
+      --build:#B8C766; --build-soft:#262A12; --refine:#A9B879; --refine-soft:#22240F;
+      --bad:#E0888A; --bad-soft:#331616;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161C; --surface:#1B1E26; --surface-2:#20232C; --border:#30333E;
+    --ink:#EDEFF4; --ink-muted:#9AA1B0; --accent:#8DA0E0; --accent-soft:#232B42;
+    --scope:#E0A857; --scope-soft:#332912; --prebuild:#7FB4E0; --prebuild-soft:#152633;
+    --build:#B8C766; --build-soft:#262A12; --refine:#A9B879; --refine-soft:#22240F;
+    --bad:#E0888A; --bad-soft:#331616;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",-apple-system,sans-serif;font-size:15px;line-height:1.6;padding-inline:16px;}
+  .page{max-width:900px;margin:0 auto;padding-block:40px 80px;}
+  header.masthead{padding-bottom:24px;margin-bottom:32px;border-bottom:1px solid var(--border);}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:0.09em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .eyebrow::before{content:"";width:7px;height:7px;background:var(--accent);display:inline-block;}
+  h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(26px,4vw,34px);line-height:1.15;margin:0 0 12px;text-wrap:balance;}
+  .dek{font-size:15.5px;color:var(--ink-muted);max-width:64ch;margin:0 0 14px;}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-muted);}
+  .meta strong{color:var(--ink);font-weight:600;}
+  section{margin-bottom:40px;}
+  .section-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;}
+  .section-num{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);background:var(--accent-soft);padding:2px 7px;border-radius:4px;flex:none;}
+  h2{font-family:"IBM Plex Serif",Georgia,serif;font-size:20px;font-weight:600;margin:0;}
+  p{margin:0 0 12px;}
+  .lede{color:var(--ink-muted);}
+  .finding{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px;}
+  .finding-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .finding-num{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-muted);background:var(--surface-2);padding:2px 7px;border-radius:4px;}
+  .status{font-family:"IBM Plex Mono",monospace;font-size:10.5px;padding:2px 8px;border-radius:999px;font-weight:600;margin-left:auto;}
+  .status-open{background:var(--bad-soft);color:var(--bad);}
+  .status-worse{background:var(--bad-soft);color:var(--bad);border:1px solid var(--bad);}
+  .finding h3{margin:0;font-size:15px;font-weight:600;}
+  .finding .evidence{font-size:13px;color:var(--ink-muted);margin-bottom:8px;}
+  .finding .evidence code{font-family:"IBM Plex Mono",monospace;font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:3px;}
+  .finding .fix{display:flex;gap:8px;font-size:13.5px;background:var(--accent-soft);border-radius:8px;padding:10px 12px;}
+  .finding .fix b{color:var(--accent);flex:none;}
+  .figure{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:16px 16px 12px;margin:14px 0;}
+  .figure svg{width:100%;height:auto;display:block;}
+  .figure figcaption{font-size:12px;color:var(--ink-muted);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);}
+  footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-muted);font-family:"IBM Plex Mono",monospace;}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Visual audit · Build Schedule</div>
+    <h1>What's actually wrong with the current view</h1>
+    <p class="dek">Grounded in the live page at <code>sequoya.app/clients</code> tonight — real client names, real dates, real bars. Timed deliberately: Joaquin is about to add three new visual states to this exact chart (OOO lane, open-capacity marker, lead_builder tag), and two of the seven issues below get worse, not better, if they land on top of this as-is.</p>
+    <div class="flag" style="margin-top:14px;">
+      <span>↳</span>
+      <p><b>Checked against the shipped build:</b> the capacity tile, lead_builder badges, and open-capacity marker are real and match the spec — good. None of the seven layout fixes below landed, and #1 got worse: adding the builder tag next to each name ate into the name column's width with no adjustment, so Nathan Dart and Maria Florou now truncate too, not just Nicholas. See the status marks below.</p>
+    </div>
+    <div class="meta">
+      <span><strong>Source</strong> Live screenshots, tonight</span>
+      <span><strong>Companion to</strong> Build Schedule Automation v2.7</span>
+      <span><strong>For</strong> Joaquin — same pass as the new states</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-head"><span class="section-num">01</span><h2>Seven concrete issues</h2></div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-num">1</span><h3>Truncated client name, no way to read it</h3><span class="status status-worse">Worse now</span></div>
+      <div class="evidence">On the chart, <code>Nicholas Ble…</code> clips mid-name with no tooltip, no title attribute, no expand. The full name (Nicholas Bletsis or similar) is simply unavailable from this view. <b>Checked against the live build:</b> adding the <code>lead_builder</code> tag next to each name ate into the same column with no width adjustment — <code>Nathan Dart</code> now renders as <code>Nathan…</code> and <code>Maria Florou</code> as <code>Maria…</code>, neither of which clipped before. The fix list below got longer, not shorter.</div>
+      <div class="fix"><b>Fix</b> Add a <code>title</code> attribute for hover, or let the label wrap to a second line instead of clipping — a Gantt row has vertical room, a fixed single-line label doesn't need to fight for it.</div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-num">2</span><h3>Row heights aren't fixed — the grid doesn't line up</h3><span class="status status-open">Still open</span></div>
+      <div class="evidence">Nathan Dart's left-column metadata is 3 lines (name, company, kickoff). Maria Florou's and Danielle Dwyer's are 4 (name, kickoff, scope/SOW line, access-ready line). Each row is a different height, so the bars beside them sit at inconsistent vertical positions — the thing that makes a Gantt scannable at a glance.</div>
+      <div class="figure">
+        <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of uneven row heights comparing Nathan Dart's 3-line row to Maria Florou's 4-line row">
+          <g font-family="IBM Plex Sans, sans-serif">
+            <text x="10" y="24" font-size="13" font-weight="600" fill="var(--ink)">Nathan Dart</text>
+            <text x="10" y="42" font-size="11" fill="var(--ink-muted)">Status Technology</text>
+            <text x="10" y="58" font-size="11" fill="var(--ink-muted)">Kickoff 30 Aug</text>
+            <rect x="250" y="14" width="180" height="16" fill="var(--build)"/>
+            <line x1="0" y1="70" x2="700" y2="70" stroke="var(--border)" stroke-dasharray="3 3"/>
+
+            <text x="10" y="94" font-size="13" font-weight="600" fill="var(--ink)">Maria Florou</text>
+            <text x="10" y="112" font-size="11" fill="var(--ink-muted)">Kickoff 7 Sept</text>
+            <text x="10" y="128" font-size="11" fill="var(--ink-muted)">Scope call 28 Aug · SOW due 2 Sept</text>
+            <text x="10" y="144" font-size="11" fill="var(--ink-muted)">Access ready 7 Sept</text>
+            <rect x="250" y="118" width="180" height="16" fill="var(--build)"/>
+          </g>
+          <g stroke="var(--bad)" stroke-width="1.5" stroke-dasharray="4 3" fill="none">
+            <line x1="245" y1="8" x2="245" y2="152"/>
+          </g>
+          <text x="450" y="94" font-size="11" fill="var(--bad)" font-family="IBM Plex Mono, monospace">bars start at different y, same column</text>
+        </svg>
+        <figcaption>Real content, real heights — Nathan's row is 44px shorter than Maria's, and the bars inherit that offset.</figcaption>
+      </div>
+      <div class="fix"><b>Fix</b> Give every row a fixed <code>min-height</code> sized to the longest realistic metadata block (4 lines), or truncate the metadata line itself to one summary line with the rest on hover — don't let the bar's vertical position depend on how much text a client happens to have.</div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-num">3</span><h3>"Awaiting kickoff" list has no urgency signal</h3><span class="status status-open">Still open</span></div>
+      <div class="evidence">Helen Nguyen, Dylan Yard, Sof and Chris, Lance Vale, Emma Cattell, Julio Rojas, Damian Burstow, Dan White, Morgan Nelson all read <code>No dates set yet</code> in identical gray text — same visual weight as Jess Plane (<code>Scope call 5 Sept</code>) or Angelina Badri (<code>Scope call 22 July</code>, over a month overdue relative to the other dates on screen).</div>
+      <div class="fix"><b>Fix</b> This is exactly the signal the automation work computes — Angelina's scope call is old enough to be worth a different color or a small flag, and "no dates set" is a different state from "scope call booked." Don't wait for the capacity tile to surface this; group or color this list by state now.</div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-num">4</span><h3>Bars clip at the right edge with no signal there's more</h3><span class="status status-open">Still open</span></div>
+      <div class="evidence">Danielle Dwyer's Pre-Build bar (blue) runs to 12 Oct/1 Oct but the visible date axis stops at 28 Sept — the bar is cut off flush against the container edge. Nothing on the chart itself hints there's more; only a thin horizontal scrollbar at the very bottom gives it away, and it's easy to miss entirely.</div>
+      <div class="figure">
+        <svg viewBox="0 0 700 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of Danielle Dwyer's bar clipping at the right edge of the visible chart with no fade or affordance">
+          <rect x="0" y="0" width="700" height="90" fill="var(--surface-2)"/>
+          <text x="10" y="20" font-size="12" font-weight="600" fill="var(--ink)" font-family="IBM Plex Sans, sans-serif">Danielle Dwyer</text>
+          <rect x="10" y="30" width="480" height="20" fill="var(--prebuild)"/>
+          <g>
+            <rect x="670" y="30" width="30" height="20" fill="var(--prebuild)"/>
+            <rect x="670" y="30" width="30" height="20" fill="url(#fadeMask)"/>
+          </g>
+          <defs>
+            <linearGradient id="fadeMask" x1="0" x2="1">
+              <stop offset="0" stop-color="var(--surface-2)" stop-opacity="0"/>
+              <stop offset="1" stop-color="var(--bad)" stop-opacity="0.5"/>
+            </linearGradient>
+          </defs>
+          <line x1="700" y1="24" x2="700" y2="56" stroke="var(--bad)" stroke-width="3"/>
+          <text x="620" y="74" font-size="10.5" fill="var(--bad)" font-family="IBM Plex Mono, monospace" text-anchor="end">hard cut, container edge — no fade, no arrow</text>
+        </svg>
+        <figcaption>The bar keeps going past 12 Oct in the real data; the view gives no visual cue that it does.</figcaption>
+      </div>
+      <div class="fix"><b>Fix</b> A fade gradient or a small ">" chevron at the container's right edge whenever a bar's end date exceeds the visible range — cheap to add, and it's the same edge where Jack's new OOO lane and the open-capacity marker are about to render, so worth fixing before those land there too.</div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-num">5</span><h3>The "tentative" bar has no label on the bar itself</h3><span class="status status-open">Still open</span></div>
+      <div class="evidence">Nicholas's dashed, unfilled bar is the only visual cue that his kickoff is tentative — the word "(tentative)" only appears as small aside text in the left column, several lines down from the bar it describes. Easy to miss when scanning bars left to right.</div>
+      <div class="fix"><b>Fix</b> Put the state name on or directly above the bar itself. This matters beyond this one case: the automation spec (section 07) proposes reusing this exact dashed idiom for the new "open window" marker — if the tentative state is already easy to miss here, the new one will be too, unless this gets fixed first rather than copied.</div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-num">6</span><h3>Four segment colors, all warm, distinguished by hue alone</h3><span class="status status-open">Still open</span></div>
+      <div class="evidence">Scope (amber), Pre-Build (blue), Build (lime), Refinement (olive) — scope and refinement in particular sit close enough in hue/lightness to be hard to tell apart at a glance, especially for anyone with a color-vision deficiency, and there's no secondary cue (pattern, label, icon).</div>
+      <div class="fix"><b>Fix</b> Add a secondary encoding — even just a label on hover or a subtly different fill texture — before the automation work adds an OOO color and an open-capacity accent on top of these four. Six similar-toned colors with no backup cue is a harder problem than four.</div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-num">7</span><h3>Legend sits disconnected, far below the chart</h3><span class="status status-worse">Worse now</span></div>
+      <div class="evidence">The color-key legend (scope/pre-build/build/refinement) is the last thing on the page, separated from the chart it explains by the full height of all visible rows — someone has to scroll past everything to find out what a color means. <b>Checked against the live build:</b> it now has six entries (OOO and open-capacity got added), still at the very bottom — exactly the growth this finding warned about, landed without the relocation.</div>
+      <div class="fix"><b>Fix</b> Move it adjacent to the chart header, or make it sticky. It's about to grow to six entries (OOO, open window) — worth relocating now rather than after it's longer and even easier to miss.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">02</span><h2>What actually shipped well</h2></div>
+    <p class="lede">Worth saying plainly, not just cataloguing what's wrong: the capacity tile, <code>lead_builder</code> badges, and the open-capacity marker are all live and match the automation spec — real numbers, informational-only framing, no fabricated data. That part of the work is done and done right. The layout debt below is a separate, still-open piece of work, not a sign anything functional is broken.</p>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">03</span><h2>Why this still matters, now that it's live</h2></div>
+    <p class="lede">This isn't hypothetical anymore — it happened. Adding the builder tag without adjusting the name column is exactly the kind of collision this doc warned about in issue 1, and it's why issue 7 (legend) is worse, not just unaddressed: both predicted exactly what a new state landing on unfixed layout would do. None of this blocks using the page — it's legible, just not clean — but it's worth a dedicated pass rather than absorbing more debt each time a new state gets added.</p>
+  </section>
+
+  <footer>Build Schedule — visual audit · companion to the automation spec, v2.7</footer>
+
+</div>
