@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { useWorkspace, DEFAULT_NAME } from "@/lib/workspace";
@@ -90,6 +92,18 @@ export default function SettingsPage() {
           </b>{" "}
           of each month — typical for Filipino payroll.
         </p>
+      </SectionCard>
+
+      <SectionCard title="Automations">
+        <Link
+          href="/automations"
+          className="flex items-center justify-between gap-3 rounded-lg px-1 py-1 text-[14px] transition-colors hover:bg-grouped"
+        >
+          <span className="text-subtle">
+            Review and approve proposed changes to your bill reminders.
+          </span>
+          <ChevronRight size={16} className="shrink-0 text-subtle" aria-hidden />
+        </Link>
       </SectionCard>
 
       <SectionCard title="Data" emoji="🗂️">

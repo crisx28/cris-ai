@@ -1,0 +1,45 @@
+# Desired state for the finance automation — the "main.tf" of agentform.
+#
+# Edit this file, run `python -m agentform plan`, review the plan, approve it,
+# then `python -m agentform apply`. Nothing in your calendar changes until a
+# plan is approved.
+#
+# Every value below is generic demo data. Copy this file to finance.yaml
+# (gitignored) for your own numbers.
+
+version: 1
+currency: PHP
+timezone: Asia/Manila
+
+resources:
+  - id: rent
+    type: bill_reminder
+    name: Rent
+    amount: 15000.00
+    due_day: 1
+    remind_days_before: 3
+    # Optional: lets the read-only Gmail observer compare the latest statement
+    # against the amount above and flag a difference. It never edits this file.
+    gmail_query: 'subject:"rent statement"'
+
+  - id: electricity
+    type: bill_reminder
+    name: Electricity
+    amount: 2800.00
+    due_day: 12
+    remind_days_before: 2
+    gmail_query: 'subject:"electric bill"'
+
+  - id: internet
+    type: bill_reminder
+    name: Internet
+    amount: 1699.00
+    due_day: 18
+    remind_days_before: 2
+
+  - id: water
+    type: bill_reminder
+    name: Water
+    amount: 450.00
+    due_day: last
+    remind_days_before: 2

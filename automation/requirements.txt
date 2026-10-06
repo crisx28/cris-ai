@@ -1,0 +1,4 @@
+anthropic>=1.11,<2
+google-api-python-client>=2.150
+google-auth>=2.35
+PyYAML>=6.0

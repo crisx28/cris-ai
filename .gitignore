@@ -6,3 +6,7 @@ venv/
 
 # macOS
 .DS_Store
+
+# agentform: local run records, fake calendar, and your real bill spec
+automation/.agentform/
+automation/spec/finance.yaml

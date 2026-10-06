@@ -1,0 +1,8 @@
+# Explicit so gcloud does not fall back to .gitignore, which excludes
+# spec/finance.yaml — the image needs your real spec.
+.gcloudignore
+.agentform/
+tests/
+**/__pycache__/
+*.pyc
+.venv/
