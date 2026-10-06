@@ -1,0 +1,27 @@
+{
+  "id": "NN-SUPABASE",
+  "name": "Supabase",
+  "purpose": "Postgres database, storage, and realtime for client data.",
+  "defaultOwner": "miyagi",
+  "env": ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY"],
+  "tasks": [
+    { "id": "NN-SUPABASE-01", "phase": "setup", "owner": "miyagi", "title": "Create separate staging and production projects",
+      "steps": ["One project per environment, in the region closest to the client's users", "Turn on Point-in-Time Recovery for production"],
+      "doneWhen": "Both projects exist; production backups are on." },
+    { "id": "NN-SUPABASE-02", "phase": "setup", "owner": "miyagi", "title": "Manage schema as migrations",
+      "steps": ["All schema changes live in supabase/migrations and are applied by CI", "No manual edits in the production dashboard"],
+      "doneWhen": "A fresh database built from migrations matches production." },
+    { "id": "NN-SUPABASE-03", "phase": "setup", "owner": "miyagi", "title": "Enable Row Level Security on every table",
+      "steps": ["RLS on for every table in public schema", "Policies key on the signed-in user's ID (Clerk user ID when Clerk is the identity provider, NN-CLERK-04)"],
+      "doneWhen": "Database linter reports no tables without RLS; user A cannot read user B's rows." },
+    { "id": "NN-SUPABASE-04", "phase": "setup", "owner": "miyagi", "title": "Keep the service role key server-only",
+      "steps": ["SUPABASE_SERVICE_ROLE_KEY is never prefixed NEXT_PUBLIC_ and never imported by client code"],
+      "doneWhen": "Searching the built client bundle finds no service role key." },
+    { "id": "NN-SUPABASE-05", "phase": "per-release", "owner": "miyagi", "title": "Apply migrations to staging first",
+      "steps": ["Run migrations on staging, run Playwright against it, then promote to production"],
+      "doneWhen": "Production migration applied after a green staging run." },
+    { "id": "NN-SUPABASE-06", "phase": "recurring", "owner": "miyagi", "title": "Monthly backup restore test",
+      "steps": ["Restore the latest backup into a scratch project and check row counts", "Review the security and performance advisors"],
+      "doneWhen": "Restore succeeded and advisors show no critical items." }
+  ]
+}

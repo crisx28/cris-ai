@@ -1,0 +1,17 @@
+{
+  "id": "CB-BUDGET-OS",
+  "name": "Budget OS",
+  "path": "budget-os",
+  "tools": [
+    { "id": "NN-GITHUB",     "status": "active" },
+    { "id": "NN-SUPABASE",   "status": "active" },
+    { "id": "NN-CLAUDE",     "status": "active" },
+    { "id": "NN-CLERK",      "status": "planned", "note": "Auth currently runs on Supabase Auth" },
+    { "id": "NN-CLOUDFLARE", "status": "planned" },
+    { "id": "NN-TAILSCALE",  "status": "planned" },
+    { "id": "NN-PLAYWRIGHT", "status": "planned" },
+    { "id": "NN-OPENAI",     "status": "planned" },
+    { "id": "OPT-RENDER",    "status": "active" },
+    { "id": "OPT-MOTION",    "status": "active" }
+  ]
+}

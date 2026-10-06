@@ -1,0 +1,17 @@
+{
+  "$comment": "Single source of truth for tool IDs. NN-* = non-negotiable (has a playbook, required in every client build). OPT-* = optional (no playbook).",
+  "tools": [
+    { "id": "NN-CLERK",      "name": "Clerk",               "nonNegotiable": true,  "playbook": "tools/NN-CLERK.json" },
+    { "id": "NN-TAILSCALE",  "name": "Tailscale",           "nonNegotiable": true,  "playbook": "tools/NN-TAILSCALE.json" },
+    { "id": "NN-CLOUDFLARE", "name": "Cloudflare",          "nonNegotiable": true,  "playbook": "tools/NN-CLOUDFLARE.json" },
+    { "id": "NN-GITHUB",     "name": "GitHub",              "nonNegotiable": true,  "playbook": "tools/NN-GITHUB.json" },
+    { "id": "NN-SUPABASE",   "name": "Supabase",            "nonNegotiable": true,  "playbook": "tools/NN-SUPABASE.json" },
+    { "id": "NN-PLAYWRIGHT", "name": "Playwright",          "nonNegotiable": true,  "playbook": "tools/NN-PLAYWRIGHT.json" },
+    { "id": "NN-CLAUDE",     "name": "Claude subscription", "nonNegotiable": true,  "playbook": "tools/NN-CLAUDE.json" },
+    { "id": "NN-OPENAI",     "name": "OpenAI (voice + image)", "nonNegotiable": true, "playbook": "tools/NN-OPENAI.json" },
+
+    { "id": "OPT-RENDER",    "name": "Render",              "nonNegotiable": false },
+    { "id": "OPT-MOTION",    "name": "Motion",              "nonNegotiable": false },
+    { "id": "OPT-RAILWAY",   "name": "Railway",             "nonNegotiable": false }
+  ]
+}

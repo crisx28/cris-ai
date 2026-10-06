@@ -1,0 +1,27 @@
+{
+  "id": "NN-OPENAI",
+  "name": "OpenAI (voice + image)",
+  "purpose": "Voice (speech-to-text and text-to-speech) and image generation. Text features use Claude (NN-CLAUDE).",
+  "defaultOwner": "polly",
+  "env": ["OPENAI_API_KEY", "OPENAI_PROJECT_ID"],
+  "tasks": [
+    { "id": "NN-OPENAI-01", "phase": "setup", "owner": "polly", "title": "Create a project and scoped key per client build",
+      "steps": ["One OpenAI project per client build", "Restrict the key to the audio and image endpoints only"],
+      "doneWhen": "Key cannot call endpoints outside voice and image." },
+    { "id": "NN-OPENAI-02", "phase": "setup", "owner": "polly", "title": "Set budget limits and keep the key server-side",
+      "steps": ["Monthly budget and alert threshold on the project", "Call the API only from server routes"],
+      "doneWhen": "Budget is set; the client bundle contains no key." },
+    { "id": "NN-OPENAI-03", "phase": "setup", "owner": "polly", "title": "Wire voice input and output",
+      "steps": ["Speech-to-text for voice input; text-to-speech for spoken replies", "Ask for microphone permission only when the user starts recording", "Do not store audio after transcription unless the client asks"],
+      "doneWhen": "A voice note becomes text, and a reply can be played back." },
+    { "id": "NN-OPENAI-04", "phase": "setup", "owner": "polly", "title": "Wire image generation",
+      "steps": ["Generate on the server and save results to Supabase Storage (NN-SUPABASE)", "Apply moderation to prompts before generating"],
+      "doneWhen": "Generated images are stored and served from Storage." },
+    { "id": "NN-OPENAI-05", "phase": "per-release", "owner": "polly", "title": "Test voice and image fallbacks",
+      "steps": ["Playwright checks that the UI handles a missing key or API error cleanly (NN-PLAYWRIGHT-03)"],
+      "doneWhen": "Features degrade gracefully with OPENAI_API_KEY unset." },
+    { "id": "NN-OPENAI-06", "phase": "recurring", "owner": "polly", "title": "Monthly usage and key rotation",
+      "steps": ["Review spend per build", "Rotate the key quarterly"],
+      "doneWhen": "Usage logged; rotation date recorded." }
+  ]
+}

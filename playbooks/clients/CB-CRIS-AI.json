@@ -1,0 +1,16 @@
+{
+  "id": "CB-CRIS-AI",
+  "name": "Cris.AI assistant",
+  "path": ".",
+  "tools": [
+    { "id": "NN-GITHUB",     "status": "active" },
+    { "id": "NN-CLAUDE",     "status": "active" },
+    { "id": "NN-CLERK",      "status": "planned" },
+    { "id": "NN-CLOUDFLARE", "status": "planned" },
+    { "id": "NN-TAILSCALE",  "status": "planned" },
+    { "id": "NN-SUPABASE",   "status": "planned" },
+    { "id": "NN-PLAYWRIGHT", "status": "planned" },
+    { "id": "NN-OPENAI",     "status": "planned" },
+    { "id": "OPT-RAILWAY",   "status": "active" }
+  ]
+}

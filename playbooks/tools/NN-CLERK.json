@@ -1,0 +1,27 @@
+{
+  "id": "NN-CLERK",
+  "name": "Clerk",
+  "purpose": "User identity: sign-up, sign-in, sessions, and organizations for every client build.",
+  "defaultOwner": "miyagi",
+  "env": ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "CLERK_SECRET_KEY", "CLERK_WEBHOOK_SIGNING_SECRET"],
+  "tasks": [
+    { "id": "NN-CLERK-01", "phase": "setup", "owner": "miyagi", "title": "Create separate Development and Production instances",
+      "steps": ["Create one Clerk application per client build", "Keep dev and prod instances separate; never point prod at dev keys", "Set the production domain and verify its DNS records in Cloudflare (NN-CLOUDFLARE)"],
+      "doneWhen": "Prod instance is live on the client domain with verified DNS." },
+    { "id": "NN-CLERK-02", "phase": "setup", "owner": "miyagi", "title": "Store keys as environment secrets",
+      "steps": ["Add the env vars listed above to the host and to GitHub Actions secrets", "Only NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY may ship to the browser", "Confirm no key is committed (GitHub secret scanning on, NN-GITHUB-03)"],
+      "doneWhen": "App boots with keys from the environment only; repo scan is clean." },
+    { "id": "NN-CLERK-03", "phase": "setup", "owner": "miyagi", "title": "Protect routes with middleware",
+      "steps": ["Add clerkMiddleware() and mark public routes explicitly; everything else requires a session", "Protect API routes server-side, not only in the UI"],
+      "doneWhen": "Signed-out requests to a protected page or API route are rejected." },
+    { "id": "NN-CLERK-04", "phase": "setup", "owner": "miyagi", "title": "Sync users to Supabase via webhook",
+      "steps": ["Subscribe to user.created / user.updated / user.deleted", "Verify every webhook signature with CLERK_WEBHOOK_SIGNING_SECRET", "Use the Clerk user ID as the owner key in Supabase RLS policies (NN-SUPABASE-03)"],
+      "doneWhen": "Creating and deleting a test user is reflected in Supabase." },
+    { "id": "NN-CLERK-05", "phase": "per-release", "owner": "polly", "title": "Run auth end-to-end tests",
+      "steps": ["Playwright covers sign-up, sign-in, sign-out, and a protected-route redirect (NN-PLAYWRIGHT-03)", "Use Clerk testing tokens; never real accounts"],
+      "doneWhen": "Auth suite passes in CI on the release commit." },
+    { "id": "NN-CLERK-06", "phase": "recurring", "owner": "miyagi", "title": "Quarterly key rotation and access review",
+      "steps": ["Rotate CLERK_SECRET_KEY and the webhook secret", "Review dashboard members and remove anyone no longer on the project"],
+      "doneWhen": "Rotation date logged; member list matches the current team." }
+  ]
+}

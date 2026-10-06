@@ -1,0 +1,27 @@
+{
+  "id": "NN-GITHUB",
+  "name": "GitHub",
+  "purpose": "Source control, code review, CI/CD, and secrets for every client build.",
+  "defaultOwner": "miyagi",
+  "env": [],
+  "tasks": [
+    { "id": "NN-GITHUB-01", "phase": "setup", "owner": "miyagi", "title": "Create the repo under the organization",
+      "steps": ["Private by default; name it after the client build ID", "Add a README, .gitignore that excludes .env, and CODEOWNERS"],
+      "doneWhen": "Repo exists with CODEOWNERS and no secrets in history." },
+    { "id": "NN-GITHUB-02", "phase": "setup", "owner": "miyagi", "title": "Protect the main branch",
+      "steps": ["Require a pull request with at least one approval", "Require CI checks (build, lint, Playwright) to pass", "Block force-pushes and deletion"],
+      "doneWhen": "A direct push to main is rejected." },
+    { "id": "NN-GITHUB-03", "phase": "setup", "owner": "miyagi", "title": "Turn on security features",
+      "steps": ["Secret scanning with push protection", "Dependabot alerts and security updates"],
+      "doneWhen": "Security tab shows all features enabled." },
+    { "id": "NN-GITHUB-04", "phase": "setup", "owner": "miyagi", "title": "Wire CI/CD with GitHub Actions",
+      "steps": ["Install, lint, typecheck, build, then run Playwright (NN-PLAYWRIGHT-02)", "Store every tool key as an environment secret (production and staging separate)"],
+      "doneWhen": "A pull request runs the full pipeline and reports status." },
+    { "id": "NN-GITHUB-05", "phase": "per-release", "owner": "polly", "title": "Tag the release",
+      "steps": ["Merge through a reviewed pull request", "Create a tagged release with notes"],
+      "doneWhen": "Release tag points at the deployed commit." },
+    { "id": "NN-GITHUB-06", "phase": "recurring", "owner": "miyagi", "title": "Monthly access and dependency review",
+      "steps": ["Remove collaborators no longer on the project", "Merge or close open Dependabot pull requests"],
+      "doneWhen": "No stale collaborators and no open critical alerts." }
+  ]
+}

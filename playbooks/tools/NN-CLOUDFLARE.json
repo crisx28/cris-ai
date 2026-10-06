@@ -1,0 +1,27 @@
+{
+  "id": "NN-CLOUDFLARE",
+  "name": "Cloudflare",
+  "purpose": "DNS, TLS, CDN, WAF, and the public edge for every client domain.",
+  "defaultOwner": "miyagi",
+  "env": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_ZONE_ID"],
+  "tasks": [
+    { "id": "NN-CLOUDFLARE-01", "phase": "setup", "owner": "miyagi", "title": "Move the client domain onto Cloudflare DNS",
+      "steps": ["Add the zone and switch nameservers at the registrar", "Proxy (orange-cloud) the app records; leave mail records DNS-only", "Add the DNS records Clerk (NN-CLERK-01) and the host need"],
+      "doneWhen": "Zone is Active and the app resolves through Cloudflare." },
+    { "id": "NN-CLOUDFLARE-02", "phase": "setup", "owner": "miyagi", "title": "Enforce TLS",
+      "steps": ["SSL mode Full (strict)", "Always Use HTTPS on; minimum TLS 1.2; HSTS once the site is stable"],
+      "doneWhen": "SSL Labs grade A or better." },
+    { "id": "NN-CLOUDFLARE-03", "phase": "setup", "owner": "miyagi", "title": "Turn on WAF and rate limiting",
+      "steps": ["Enable the managed ruleset", "Rate-limit auth and AI endpoints (sign-in, /api/assistant, voice/image routes)"],
+      "doneWhen": "A burst test against /api/* is throttled." },
+    { "id": "NN-CLOUDFLARE-04", "phase": "setup", "owner": "miyagi", "title": "Put admin and staging behind Cloudflare Access",
+      "steps": ["Create an Access application for staging and admin hostnames", "Allow only the team's identity provider group"],
+      "doneWhen": "Staging asks for login before it loads." },
+    { "id": "NN-CLOUDFLARE-05", "phase": "setup", "owner": "miyagi", "title": "Scope the API token",
+      "steps": ["Create a token limited to this zone with only DNS edit and cache purge", "Store it as a GitHub Actions secret, never in the repo"],
+      "doneWhen": "Token works for DNS and purge only." },
+    { "id": "NN-CLOUDFLARE-06", "phase": "per-release", "owner": "miyagi", "title": "Purge cache after deploy",
+      "steps": ["Purge by URL or tag from the deploy workflow", "Smoke-test the live URL afterward"],
+      "doneWhen": "The live site serves the new build." }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "NN-TAILSCALE",
+  "name": "Tailscale",
+  "purpose": "Private network for admin access: databases, staging, and internal tools are never exposed to the public internet.",
+  "defaultOwner": "miyagi",
+  "env": ["TS_AUTHKEY"],
+  "tasks": [
+    { "id": "NN-TAILSCALE-01", "phase": "setup", "owner": "miyagi", "title": "Tag the client build's devices",
+      "steps": ["Create a tag per client build, e.g. tag:<client-id>", "Register servers with tagged, ephemeral, pre-authorized auth keys"],
+      "doneWhen": "Every machine for the build appears in the admin console under its tag." },
+    { "id": "NN-TAILSCALE-02", "phase": "setup", "owner": "miyagi", "title": "Write least-privilege ACLs",
+      "steps": ["Default deny; grant only group:admins → tag:<client-id> on the ports actually needed", "Keep the ACL file in GitHub and apply it through the Tailscale GitOps action"],
+      "doneWhen": "ACL tests in the policy file pass and changes go through pull requests." },
+    { "id": "NN-TAILSCALE-03", "phase": "setup", "owner": "miyagi", "title": "Turn on Tailscale SSH and MagicDNS",
+      "steps": ["Replace public SSH with Tailscale SSH; close port 22 on the host firewall", "Use MagicDNS names in runbooks instead of IPs"],
+      "doneWhen": "No admin port is reachable from the public internet." },
+    { "id": "NN-TAILSCALE-04", "phase": "per-release", "owner": "miyagi", "title": "Confirm staging is tailnet-only",
+      "steps": ["Check that staging and admin tools resolve only inside the tailnet (or behind Cloudflare Access, NN-CLOUDFLARE-04)"],
+      "doneWhen": "An off-tailnet request to staging fails." },
+    { "id": "NN-TAILSCALE-05", "phase": "recurring", "owner": "miyagi", "title": "Monthly device and key cleanup",
+      "steps": ["Remove stale devices and expired keys", "Confirm key expiry is on for all human devices"],
+      "doneWhen": "No device older than 90 days without a check-in remains." }
+  ]
+}

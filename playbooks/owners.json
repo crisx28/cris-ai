@@ -1,0 +1,14 @@
+{
+  "miyagi": {
+    "id": "miyagi",
+    "name": "Miyagi",
+    "role": "Platform & security",
+    "covers": "Network edge, private access, identity, data, source control"
+  },
+  "polly": {
+    "id": "polly",
+    "name": "Polly",
+    "role": "Quality & AI",
+    "covers": "End-to-end testing, AI model providers, voice and image"
+  }
+}

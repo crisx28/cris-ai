@@ -1,0 +1,27 @@
+{
+  "id": "NN-CLAUDE",
+  "name": "Claude subscription",
+  "purpose": "Claude for building (Claude Code) and for in-app text features through the Claude API.",
+  "defaultOwner": "polly",
+  "env": ["ANTHROPIC_API_KEY", "CRIS_MODEL"],
+  "tasks": [
+    { "id": "NN-CLAUDE-01", "phase": "setup", "owner": "polly", "title": "Confirm the team plan and seats",
+      "steps": ["Check the build team has Claude seats with Claude Code access", "Create a separate Console workspace and API key per client build"],
+      "doneWhen": "Each build has its own key and usage is tracked separately." },
+    { "id": "NN-CLAUDE-02", "phase": "setup", "owner": "polly", "title": "Set spend limits and keep the key server-side",
+      "steps": ["Set a monthly spend limit on the workspace", "Call the API only from server routes; ANTHROPIC_API_KEY is never shipped to the browser"],
+      "doneWhen": "Limit is set; the client bundle contains no key." },
+    { "id": "NN-CLAUDE-03", "phase": "setup", "owner": "polly", "title": "Pin the model in config",
+      "steps": ["Read the model ID from an env var (e.g. CRIS_MODEL) with a current default", "Document the chosen model in the client manifest"],
+      "doneWhen": "Changing the model needs no code change." },
+    { "id": "NN-CLAUDE-04", "phase": "setup", "owner": "polly", "title": "Build a graceful fallback",
+      "steps": ["If the key is missing or the API errors, the feature degrades without breaking the page", "AI stays an assistant, never the primary interface"],
+      "doneWhen": "App works with ANTHROPIC_API_KEY unset." },
+    { "id": "NN-CLAUDE-05", "phase": "per-release", "owner": "polly", "title": "Check prompts and outputs before release",
+      "steps": ["Run a fixed set of sample prompts and compare against expected answers", "Confirm no personal data is sent in prompts or logged"],
+      "doneWhen": "Sample prompts pass review." },
+    { "id": "NN-CLAUDE-06", "phase": "recurring", "owner": "polly", "title": "Monthly usage and model review",
+      "steps": ["Review spend per build against the limit", "Check for newer models and plan upgrades"],
+      "doneWhen": "Usage logged; upgrade decision recorded." }
+  ]
+}
